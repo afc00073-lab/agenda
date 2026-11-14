@@ -185,3 +185,522 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   VISTA INICIO
+   --------------------------------------------------------------------------
+   Héroe con anillo de progreso, bloque de cuenta atrás, indicadores, línea
+   temporal del día y listas de hitos, avisos y asignaturas.
+   ========================================================================== */
+.inicio-heroe {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+    gap: var(--espacio-6);
+    padding: var(--espacio-6);
+    border-radius: var(--radio-xl);
+    border: 1px solid var(--cristal-borde);
+    background: var(--cristal-fondo);
+    background-image: var(--gradiente-superficie);
+    box-shadow: var(--sombra-elevada);
+    overflow: hidden;
+}
+
+.inicio-heroe::before {
+    content: "";
+    position: absolute;
+    inset: -60% 40% auto -20%;
+    height: 340px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--acento) 26%, transparent), transparent 66%);
+    filter: blur(24px);
+    pointer-events: none;
+}
+
+.heroe-progreso {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-6);
+    min-width: 0;
+}
+
+.heroe-progreso__anillo {
+    position: relative;
+    width: 152px;
+    height: 152px;
+    flex: 0 0 152px;
+}
+
+.heroe-progreso__anillo svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    overflow: visible;
+}
+
+.anillo-inicio__fondo {
+    fill: none;
+    stroke: color-mix(in srgb, var(--texto-tenue) 24%, transparent);
+    stroke-width: 9;
+}
+
+.anillo-inicio__valor {
+    fill: none;
+    stroke: var(--acento-secundario);
+    stroke-width: 9;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--acento-secundario) 55%, transparent));
+    transition: stroke-dashoffset 1.2s var(--transicion-suave);
+}
+
+.heroe-progreso__centro {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    gap: 0;
+}
+
+.heroe-progreso__cifra {
+    font-size: 2.35rem;
+    font-weight: var(--peso-titulo);
+    letter-spacing: -0.06em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.heroe-progreso__cifra small {
+    font-size: 1rem;
+    font-weight: var(--peso-semi);
+    color: var(--texto-secundario);
+    margin-left: 2px;
+}
+
+.heroe-progreso__texto {
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+}
+
+.heroe-progreso__info {
+    min-width: 0;
+}
+
+.heroe-progreso__etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--tamano-texto-xs);
+    font-weight: var(--peso-semi);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--acento-secundario);
+}
+
+.heroe-progreso__etiqueta svg {
+    width: 15px;
+    height: 15px;
+}
+
+.heroe-progreso__titulo {
+    margin-top: var(--espacio-2);
+    font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+    font-weight: var(--peso-titulo);
+    letter-spacing: -0.045em;
+    line-height: 1.15;
+}
+
+.heroe-progreso__detalle {
+    margin-top: var(--espacio-2);
+    max-width: 48ch;
+    font-size: var(--tamano-texto-sm);
+    color: var(--texto-secundario);
+}
+
+.heroe-progreso__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-2);
+    margin-top: var(--espacio-4);
+}
+
+/* ---- Bloque del próximo hito ------------------------------------------- */
+.heroe-hito {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-2);
+    min-width: 0;
+    padding: var(--espacio-5);
+    border-radius: var(--radio-grande);
+    border: 1px solid color-mix(in srgb, var(--color-hito) 28%, var(--cristal-borde));
+    background:
+        linear-gradient(160deg, color-mix(in srgb, var(--color-hito) 16%, transparent), transparent 70%),
+        color-mix(in srgb, var(--fondo-principal) 46%, transparent);
+    overflow: hidden;
+}
+
+.heroe-hito::after {
+    content: "";
+    position: absolute;
+    top: -30%;
+    right: -25%;
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-hito) 55%, transparent), transparent 68%);
+    filter: blur(26px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.heroe-hito--libre {
+    border-color: var(--cristal-borde);
+    background: color-mix(in srgb, var(--fondo-principal) 40%, transparent);
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.heroe-hito__icono {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    color: var(--color-aviso);
+    background: color-mix(in srgb, var(--color-aviso) 15%, transparent);
+}
+
+.heroe-hito__icono svg {
+    width: 21px;
+    height: 21px;
+}
+
+.heroe-hito__cabecera {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-2);
+}
+
+.heroe-hito__etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: var(--peso-fuerte);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--color-hito, var(--acento)) 82%, var(--texto-primario));
+}
+
+.heroe-hito__etiqueta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.heroe-hito__titulo {
+    position: relative;
+    z-index: 1;
+    font-size: var(--tamano-texto-lg);
+    font-weight: var(--peso-fuerte);
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+}
+
+.heroe-hito__detalle {
+    position: relative;
+    z-index: 1;
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-secundario);
+}
+
+.heroe-hito__pie {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-2);
+    margin-top: auto;
+    padding-top: var(--espacio-3);
+    border-top: 1px solid color-mix(in srgb, var(--color-hito, var(--acento)) 20%, transparent);
+}
+
+.heroe-hito__fecha {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-secundario);
+}
+
+.heroe-hito__fecha svg {
+    width: 13px;
+    height: 13px;
+}
+
+.heroe-hito__cuenta {
+    font-size: var(--tamano-texto-xs);
+    font-weight: var(--peso-fuerte);
+    color: var(--texto-primario);
+}
+
+/* ---- Indicadores ------------------------------------------------------- */
+.tarjeta--kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--espacio-5);
+}
+
+.kpi__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--espacio-2);
+}
+
+.kpi__icono {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radio-medio);
+    color: var(--tono, var(--acento));
+    background: color-mix(in srgb, var(--tono, var(--acento)) 14%, transparent);
+}
+
+.kpi__icono svg {
+    width: 19px;
+    height: 19px;
+}
+
+.kpi__insignia {
+    font-size: var(--tamano-texto-xs);
+    font-weight: var(--peso-semi);
+    color: var(--color-exito);
+}
+
+.kpi__valor {
+    font-size: 2rem;
+    font-weight: var(--peso-titulo);
+    letter-spacing: -0.055em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.kpi__unidad {
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-medio);
+    color: var(--texto-tenue);
+    letter-spacing: 0;
+    margin-left: 2px;
+}
+
+.kpi__etiqueta {
+    margin-top: var(--espacio-2);
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-semi);
+}
+
+.kpi__detalle {
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+}
+
+/* ---- Línea temporal del día ------------------------------------------- */
+.linea-tiempo {
+    display: flex;
+    flex-direction: column;
+}
+
+.linea-tiempo__fila {
+    display: grid;
+    grid-template-columns: 52px 22px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: var(--espacio-2);
+    padding: var(--espacio-2) var(--espacio-1);
+    border-radius: var(--radio-pequeno);
+    cursor: pointer;
+    transition: background-color var(--duracion-media) var(--transicion-suave);
+}
+
+.linea-tiempo__fila:hover {
+    background: color-mix(in srgb, var(--texto-primario) 4%, transparent);
+}
+
+.linea-tiempo__hora {
+    font-size: var(--tamano-texto-xs);
+    font-weight: var(--peso-semi);
+    color: var(--texto-secundario);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.linea-tiempo__riel {
+    position: relative;
+    align-self: stretch;
+    display: grid;
+    place-items: center;
+}
+
+.linea-tiempo__riel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: color-mix(in srgb, var(--texto-tenue) 22%, transparent);
+}
+
+.linea-tiempo__punto {
+    position: relative;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--color-evento, var(--acento));
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-evento, var(--acento)) 18%, transparent);
+}
+
+.linea-tiempo__tarjeta {
+    min-width: 0;
+    padding: var(--espacio-2) 0;
+}
+
+.linea-tiempo__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-2);
+}
+
+.linea-tiempo__titulo {
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-semi);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.linea-tiempo__detalle {
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.linea-tiempo__fila .marca-verificacion {
+    justify-self: end;
+}
+
+/* ---- Listas de hitos, avisos y asignaturas ---------------------------- */
+.hito-fila__marca {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: var(--radio-medio);
+    color: #06101a;
+}
+
+.hito-fila__marca svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 2.1;
+}
+
+.lista-asignaturas-mini {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-1);
+}
+
+.asignatura-mini {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-3);
+    width: 100%;
+    padding: var(--espacio-2) var(--espacio-2);
+    border-radius: var(--radio-pequeno);
+    text-align: left;
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-suave);
+}
+
+.asignatura-mini:hover {
+    background: color-mix(in srgb, var(--texto-primario) 4%, transparent);
+    transform: translateX(2px);
+}
+
+.asignatura-mini__punto {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    border-radius: 50%;
+    background: var(--color-asignatura, var(--acento));
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-asignatura, var(--acento)) 15%, transparent);
+}
+
+.asignatura-mini__texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.asignatura-mini__nombre {
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-semi);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.asignatura-mini__detalle {
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.asignatura-mini__creditos {
+    flex: 0 0 auto;
+    font-size: 0.66rem;
+    font-weight: var(--peso-semi);
+    color: var(--texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* ---- Adaptación -------------------------------------------------------- */
+@media (max-width: 1280px) {
+    .inicio-heroe {
+        grid-template-columns: 1fr;
+    }
+
+    .heroe-hito {
+        min-height: 190px;
+    }
+}
+
+@media (max-width: 760px) {
+    .heroe-progreso {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--espacio-4);
+    }
+
+    .linea-tiempo__fila {
+        grid-template-columns: 44px 18px minmax(0, 1fr) 26px;
+    }
+}

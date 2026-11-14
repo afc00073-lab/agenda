@@ -345,7 +345,7 @@
             return;
         }
         const raiz = document.createElement("section");
-        raiz.className = "vista";
+        raiz.className = "vista activa";
         raiz.dataset.vista = ESTADO.vista;
         NODOS.contenedor.append(raiz);
         try {
@@ -372,7 +372,11 @@
             renderizarVista();
         }
         global.setTimeout(() => {
-            if (ESTADO.vista === identificador && !NODOS.contenedor.firstElementChild?.dataset.vista) {
+            if (
+                ESTADO.vista === identificador &&
+                NODOS.contenedor &&
+                !NODOS.contenedor.firstElementChild?.dataset.vista
+            ) {
                 renderizarVista();
             }
         }, 0);
