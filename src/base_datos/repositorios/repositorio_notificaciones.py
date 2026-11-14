@@ -8,7 +8,6 @@ programada_para)`` garantiza idempotencia entre reinicios.
 
 from __future__ import annotations
 
-import sqlite3
 from typing import Any
 
 from src.base_datos.repositorios.repositorio_base import RepositorioBase
@@ -52,18 +51,34 @@ class RepositorioNotificaciones(RepositorioBase):
             La notificación creada, o ``None`` si ya existía una idéntica.
         """
 
-        try:
-            identificador = self.gestor.ejecutar(
-                """
-                INSERT INTO notificaciones
-                    (evento_id, titulo, mensaje, programada_para, enviada, creada_en)
-                VALUES (?, ?, ?, ?, 0, ?)
-                """,
-                (evento_id, titulo, mensaje, programada_para, self.marca_tiempo()),
-            )
-        except sqlite3.IntegrityError:
+        identificador_filas = self.gestor.ejecutar_filas(
+            """
+            INSERT OR IGNORE INTO notificaciones
+                (evento_id, titulo, mensaje, programada_para, enviada, creada_en)
+            VALUES (?, ?, ?, ?, 0, ?)
+            """,
+            (evento_id, titulo, mensaje, programada_para, self.marca_tiempo()),
+        )
+        if identificador_filas == 0:
             return None
-        return self.obtener(identificador)
+        if evento_id is None:
+            fila = self.gestor.consultar_uno(
+                "SELECT * FROM notificaciones WHERE evento_id IS NULL AND programada_para = ? "
+                "ORDER BY id DESC LIMIT 1",
+                (programada_para,),
+            )
+        else:
+            fila = self.gestor.consultar_uno(
+                "SELECT * FROM notificaciones WHERE evento_id = ? AND programada_para = ?",
+                (evento_id, programada_para),
+            )
+        if fila is None:
+            return None
+        self.gestor.ejecutar(
+            "UPDATE notificaciones SET titulo = ?, mensaje = ? WHERE id = ?",
+            (titulo, mensaje, fila["id"]),
+        )
+        return self.obtener(int(fila["id"]))
 
     def obtener(self, notificacion_id: int) -> dict[str, Any] | None:
         """Busca una notificación por identificador.

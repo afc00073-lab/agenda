@@ -177,6 +177,24 @@ class GestorBaseDatos:
             cursor = conexion.execute(sentencia, tuple(parametros))
             return int(cursor.lastrowid or cursor.rowcount or 0)
 
+    def ejecutar_filas(self, sentencia: str, parametros: Sequence[Any] = ()) -> int:
+        """Ejecuta una escritura y devuelve cuántas filas cambió realmente.
+
+        Resulta útil con ``INSERT OR IGNORE``: un resultado ``0`` indica que la
+        restricción única impidió la inserción.
+
+        Args:
+            sentencia: SQL con marcadores ``?``.
+            parametros: Valores a enlazar.
+
+        Returns:
+            Número de filas afectadas (``cursor.rowcount``).
+        """
+
+        with self.transaccion() as conexion:
+            cursor = conexion.execute(sentencia, tuple(parametros))
+            return int(cursor.rowcount)
+
     def ejecutar_muchos(self, sentencia: str, filas: Sequence[Sequence[Any]]) -> int:
         """Ejecuta una sentencia para varias filas dentro de una transacción.
 
