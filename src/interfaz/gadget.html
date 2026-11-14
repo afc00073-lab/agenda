@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="cristal-medianoche">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plan de Hoy · Agenda Académica</title>
+
+    <!-- Sistema de diseño compartido con la ventana principal -->
+    <link rel="stylesheet" href="recursos/css/variables.css" />
+    <link rel="stylesheet" href="recursos/css/temas.css" />
+    <link rel="stylesheet" href="recursos/css/animaciones.css" />
+    <link rel="stylesheet" href="recursos/css/componentes.css" />
+    <link rel="stylesheet" href="recursos/css/gadget.css" />
+</head>
+<body class="cuerpo-gadget">
+    <!-- Tarjeta flotante: todo el contenido vive dentro de este contenedor -->
+    <main class="gadget" id="gadget" aria-label="Gadget Plan de Hoy">
+        <div class="gadget__brillo" aria-hidden="true"></div>
+
+        <!-- Definición del degradado del anillo de progreso -->
+        <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+            <defs>
+                <linearGradient id="gradienteGadget" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#7c6cff" />
+                    <stop offset="55%" stop-color="#4aa8ff" />
+                    <stop offset="100%" stop-color="#34e2c4" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- Cabecera arrastrable -->
+        <header class="gadget__cabecera" id="zona-arrastre" title="Arrastra para mover el gadget">
+            <div class="gadget__identidad">
+                <span class="gadget__punto" aria-hidden="true"></span>
+                <div>
+                    <p class="gadget__fecha" id="gadget-fecha">Cargando fecha…</p>
+                    <h1 class="gadget__saludo" id="gadget-saludo">Plan de Hoy</h1>
+                    <span class="gadget__bloqueo-indicador" id="indicador-bloqueo">
+                        <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                            <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                            <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                        </svg>
+                        Posición bloqueada
+                    </span>
+                </div>
+            </div>
+
+            <div class="gadget__acciones">
+                <button class="gadget__boton" id="btn-bloquear" type="button"
+                        data-tooltip="Bloquear posición" aria-label="Bloquear posición">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                        <path d="M8 11V7a4 4 0 0 1 7.5-2"></path>
+                    </svg>
+                </button>
+                <button class="gadget__boton" id="btn-compacto" type="button"
+                        data-tooltip="Vista compacta" aria-label="Alternar vista compacta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 9V5a1 1 0 0 1 1-1h4"></path>
+                        <path d="M20 9V5a1 1 0 0 0-1-1h-4"></path>
+                        <path d="M4 15v4a1 1 0 0 0 1 1h4"></path>
+                        <path d="M20 15v4a1 1 0 0 1-1 1h-4"></path>
+                    </svg>
+                </button>
+                <button class="gadget__boton" id="btn-abrir" type="button"
+                        data-tooltip="Abrir agenda" aria-label="Abrir la agenda">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 4h6v6"></path>
+                        <path d="M20 4 11 13"></path>
+                        <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path>
+                    </svg>
+                </button>
+                <button class="gadget__boton gadget__boton--peligro" id="btn-ocultar" type="button"
+                        data-tooltip="Ocultar gadget" aria-label="Ocultar el gadget">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Progreso del día -->
+        <section class="gadget__progreso" aria-label="Progreso del día">
+            <div class="gadget__anillo">
+                <svg viewBox="0 0 54 54">
+                    <circle class="gadget__anillo-fondo" cx="27" cy="27" r="23"></circle>
+                    <circle class="gadget__anillo-valor" id="anillo-valor" cx="27" cy="27" r="23"></circle>
+                </svg>
+                <span class="gadget__anillo-texto" id="anillo-texto">0%</span>
+            </div>
+            <div class="gadget__progreso-info">
+                <p class="gadget__progreso-titulo">Plan de hoy</p>
+                <p class="gadget__progreso-valor" id="progreso-valor">0 de 0 completado</p>
+                <p class="gadget__progreso-detalle" id="progreso-detalle">Preparando tu día…</p>
+            </div>
+        </section>
+
+        <!-- Cuenta atrás del próximo examen o entrega -->
+        <section class="gadget__cuenta-atras" id="cuenta-atras" aria-label="Próximo hito">
+            <p class="gadget__hito-etiqueta">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <circle cx="12" cy="13" r="8"></circle>
+                    <path d="M12 9v4l2.5 2.5"></path>
+                    <path d="M9 2h6"></path>
+                </svg>
+                Próximo hito
+            </p>
+            <h2 class="gadget__hito-titulo" id="hito-titulo">Sin exámenes ni entregas cercanas</h2>
+            <div class="gadget__tiempos">
+                <div class="gadget__tiempo"><strong id="hito-dias">00</strong><span>días</span></div>
+                <div class="gadget__tiempo"><strong id="hito-horas">00</strong><span>horas</span></div>
+                <div class="gadget__tiempo"><strong id="hito-minutos">00</strong><span>min</span></div>
+            </div>
+            <div class="gadget__hito-barra"><span id="hito-progreso"></span></div>
+        </section>
+
+        <!-- Tareas de hoy -->
+        <section class="gadget__tareas" aria-label="Tareas de hoy">
+            <div class="gadget__tareas-cabecera">
+                <h3 class="gadget__tareas-titulo">Tareas de hoy</h3>
+                <span class="gadget__tareas-contador" id="contador-tareas">0 pendientes</span>
+            </div>
+            <ul class="gadget__lista-tareas" id="lista-tareas">
+                <li class="gadget__vacio">
+                    <div class="cargando__rueda"></div>
+                    <span>Sincronizando con tu agenda…</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Control de opacidad: aparece al pasar el ratón -->
+        <footer class="gadget__controles">
+            <span class="gadget__controles-etiqueta">Opacidad</span>
+            <input class="gadget__deslizador" id="control-opacidad" type="range"
+                   min="30" max="100" step="1" value="92" aria-label="Opacidad del gadget" />
+            <span class="gadget__valor-opacidad" id="valor-opacidad">92%</span>
+        </footer>
+    </main>
+
+    <!-- Puente con Python (QWebChannel) y lógica del gadget -->
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="recursos/js/puente.js"></script>
+    <script src="recursos/js/gadget.js"></script>
+</body>
+</html>

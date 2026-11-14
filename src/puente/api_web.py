@@ -61,6 +61,7 @@ class ApiPuente(QObject):
     solicitudNavegacion = Signal(str)
     solicitudModal = Signal(str)
     temaCambiado = Signal(str)
+    gadgetArrastrado = Signal(str)
 
     def __init__(
         self,
@@ -979,6 +980,56 @@ class ApiPuente(QObject):
         """
 
         return self.guardar_estado_gadget(json.dumps({"visible": visible}))
+
+    @Slot(result=str)
+    def iniciar_arrastre_gadget(self) -> str:
+        """Inicia el arrastre de la ventana nativa del gadget.
+
+        Returns:
+            JSON de confirmación; la ventana recuerda su posición de origen.
+        """
+
+        self.gadgetArrastrado.emit(json.dumps({"accion": "iniciar"}))
+        return self._respuesta({"arrastrando": True})
+
+    @Slot(int, int, result=str)
+    def mover_gadget(self, delta_x: int, delta_y: int) -> str:
+        """Desplaza el gadget según el delta del puntero.
+
+        Args:
+            delta_x: Desplazamiento horizontal en píxeles.
+            delta_y: Desplazamiento vertical en píxeles.
+
+        Returns:
+            JSON de confirmación.
+        """
+
+        self.gadgetArrastrado.emit(
+            json.dumps({"accion": "mover", "dx": int(delta_x), "dy": int(delta_y)})
+        )
+        return self._respuesta({"ok": True})
+
+    @Slot(result=str)
+    def soltar_gadget(self) -> str:
+        """Finaliza el arrastre y pide guardar la posición.
+
+        Returns:
+            JSON de confirmación.
+        """
+
+        self.gadgetArrastrado.emit(json.dumps({"accion": "soltar"}))
+        return self._respuesta({"soltado": True})
+
+    @Slot(result=str)
+    def abrir_agenda(self) -> str:
+        """Solicita mostrar la ventana principal en la vista de inicio.
+
+        Returns:
+            JSON de confirmación.
+        """
+
+        self.solicitudNavegacion.emit("inicio")
+        return self._respuesta({"ok": True})
 
     @Slot(str, result=str)
     def cambiar_tema(self, tema: str) -> str:

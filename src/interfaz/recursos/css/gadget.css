@@ -1,0 +1,739 @@
+/* ==========================================================================
+   GADGET DE ESCRITORIO · "Plan de Hoy"
+   --------------------------------------------------------------------------
+   Ventana transparente, sin bordes y con efecto glassmorphism. El fondo real
+   del documento es transparente; la tarjeta usa un color con la variable
+   `--opacidad-gadget`, que JavaScript actualiza en vivo desde el control
+   deslizante. Los controles aparecen con una transición suave al pasar el ratón.
+   ========================================================================== */
+
+html,
+body {
+    background: transparent !important;
+    background-image: none !important;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.cuerpo-gadget {
+    width: 100vw;
+    height: 100vh;
+    padding: 14px;
+    font-family: var(--fuente-principal);
+    color: var(--texto-primario);
+    opacity: 1;
+}
+
+/* Colores base por tema para poder aplicar la opacidad con rgba(). */
+html[data-tema="cristal-medianoche"] .gadget {
+    --gadget-rgb: 13, 20, 38;
+    --gadget-brillo: rgba(124, 108, 255, 0.3);
+    --gadget-brillo-2: rgba(52, 226, 196, 0.18);
+}
+
+html[data-tema="noche-nordica"] .gadget {
+    --gadget-rgb: 20, 33, 52;
+    --gadget-brillo: rgba(106, 168, 255, 0.26);
+    --gadget-brillo-2: rgba(127, 209, 193, 0.16);
+}
+
+html[data-tema="luz-pura"] .gadget {
+    --gadget-rgb: 252, 253, 255;
+    --gadget-brillo: rgba(91, 91, 214, 0.18);
+    --gadget-brillo-2: rgba(14, 147, 132, 0.14);
+}
+
+/* --------------------------------------------------------------------------
+   Tarjeta principal
+   -------------------------------------------------------------------------- */
+.gadget {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 20px 20px 12px;
+    border-radius: 26px;
+    border: 1px solid color-mix(in srgb, var(--cristal-borde) 150%, transparent);
+    background: rgba(var(--gadget-rgb), var(--opacidad-gadget, 0.92));
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.42),
+        0 1px 0 rgba(255, 255, 255, 0.09) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    overflow: hidden;
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        border-color var(--duracion-lenta) var(--transicion-suave),
+        box-shadow var(--duracion-lenta) var(--transicion-suave),
+        height var(--duracion-lenta) var(--transicion-suave);
+    isolation: isolate;
+}
+
+/* Halos lumínicos internos, siempre por debajo del contenido. */
+.gadget::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    right: -110px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gadget-brillo), transparent 68%);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.gadget::after {
+    content: "";
+    position: absolute;
+    bottom: -150px;
+    left: -100px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gadget-brillo-2), transparent 70%);
+    filter: blur(10px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Borde luminoso animado que recorre el contorno al pasar el ratón. */
+.gadget__brillo {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+        130deg,
+        transparent 25%,
+        color-mix(in srgb, var(--acento) 70%, transparent) 50%,
+        transparent 75%
+    );
+    background-size: 260% 260%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duracion-lenta) var(--transicion-suave);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 2;
+}
+
+.gadget:hover .gadget__brillo {
+    opacity: 0.75;
+    animation: recorrerBrillo 4s linear infinite;
+}
+
+@keyframes recorrerBrillo {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 260% 50%;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Cabecera y zona de arrastre
+   -------------------------------------------------------------------------- */
+.gadget__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    cursor: grab;
+    position: relative;
+    z-index: 3;
+}
+
+.gadget.bloqueado .gadget__cabecera {
+    cursor: default;
+}
+
+.gadget__cabecera:active {
+    cursor: grabbing;
+}
+
+.gadget__identidad {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    flex: 1;
+}
+
+.gadget__punto {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    border-radius: 50%;
+    background: var(--acento-secundario);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--acento-secundario) 16%, transparent),
+        0 0 18px var(--acento-secundario);
+    animation: destello 2.8s ease-in-out infinite;
+}
+
+.gadget__fecha {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--texto-tenue);
+    line-height: 1.2;
+}
+
+.gadget__saludo {
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.gadget__acciones {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 12px;
+    background: rgba(var(--gadget-rgb), 0.82);
+    border: 1px solid var(--cristal-borde);
+    box-shadow: var(--sombra-suave);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+    transition: opacity var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-suave);
+}
+
+.gadget:hover .gadget__acciones,
+.gadget__acciones:focus-within {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.gadget__boton {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    color: var(--texto-secundario);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        color var(--duracion-media) var(--transicion-suave),
+        border-color var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-rebote);
+}
+
+.gadget__boton svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+.gadget__boton:hover {
+    color: var(--texto-primario);
+    background: color-mix(in srgb, var(--texto-primario) 9%, transparent);
+    border-color: var(--cristal-borde);
+    transform: translateY(-1px);
+}
+
+.gadget__boton.activo {
+    color: var(--acento-secundario);
+    background: var(--acento-suave);
+}
+
+.gadget__boton--peligro:hover {
+    color: var(--color-peligro);
+    background: color-mix(in srgb, var(--color-peligro) 12%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Progreso del día
+   -------------------------------------------------------------------------- */
+.gadget__progreso {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--texto-primario) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cristal-borde) 80%, transparent);
+    margin-bottom: 12px;
+}
+
+.gadget__anillo {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+}
+
+.gadget__anillo svg {
+    width: 54px;
+    height: 54px;
+    transform: rotate(-90deg);
+}
+
+.gadget__anillo-fondo {
+    fill: none;
+    stroke: color-mix(in srgb, var(--texto-tenue) 22%, transparent);
+    stroke-width: 5;
+}
+
+.gadget__anillo-valor {
+    fill: none;
+    stroke: url(#gradienteGadget);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 144.51;
+    stroke-dashoffset: 144.51;
+    transition: stroke-dashoffset 1.1s var(--transicion-suave);
+}
+
+.gadget__anillo-texto {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.gadget__progreso-info {
+    min-width: 0;
+}
+
+.gadget__progreso-titulo {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--texto-tenue);
+}
+
+.gadget__progreso-valor {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 1px;
+}
+
+.gadget__progreso-detalle {
+    font-size: 0.7rem;
+    color: var(--texto-secundario);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   Cuenta atrás del próximo hito
+   -------------------------------------------------------------------------- */
+.gadget__cuenta-atras {
+    position: relative;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--acento) 22%, var(--cristal-borde));
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--acento) 13%, transparent), transparent 62%),
+        color-mix(in srgb, var(--texto-primario) 3%, transparent);
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.gadget__cuenta-atras::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -32px;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--acento), transparent 70%);
+    opacity: 0.2;
+    filter: blur(14px);
+}
+
+.gadget__hito-etiqueta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--acento-secundario);
+    font-weight: 700;
+}
+
+.gadget__hito-titulo {
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin: 4px 0 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.gadget__tiempos {
+    display: flex;
+    gap: 8px;
+}
+
+.gadget__tiempo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--fondo-principal) 45%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cristal-borde) 70%, transparent);
+}
+
+.gadget__tiempo strong {
+    font-size: 1.08rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.gadget__tiempo span {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--texto-tenue);
+    margin-top: 2px;
+}
+
+.gadget__hito-barra {
+    margin-top: 10px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--texto-tenue) 20%, transparent);
+    overflow: hidden;
+}
+
+.gadget__hito-barra span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: var(--gradiente-acento);
+    transition: width 1s var(--transicion-suave);
+}
+
+/* --------------------------------------------------------------------------
+   Lista de tareas
+   -------------------------------------------------------------------------- */
+.gadget__tareas {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+    padding-bottom: 6px;
+}
+
+.gadget__tareas-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px;
+}
+
+.gadget__tareas-titulo {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--texto-tenue);
+    font-weight: 700;
+}
+
+.gadget__tareas-contador {
+    font-size: 0.64rem;
+    color: var(--texto-tenue);
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--texto-primario) 6%, transparent);
+}
+
+.gadget__lista-tareas {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 2px;
+    scrollbar-width: thin;
+}
+
+.gadget__lista-tareas::-webkit-scrollbar {
+    width: 5px;
+}
+
+.gadget__lista-tareas::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--texto-tenue) 32%, transparent);
+    border-radius: 999px;
+}
+
+.gadget__tarea {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 8px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        border-color var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-suave);
+}
+
+.gadget__tarea:hover {
+    background: color-mix(in srgb, var(--texto-primario) 5%, transparent);
+    border-color: color-mix(in srgb, var(--cristal-borde) 70%, transparent);
+    transform: translateX(2px);
+}
+
+.gadget__tarea .marca-verificacion {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    border-width: 1.4px;
+}
+
+.gadget__tarea .marca-verificacion svg {
+    width: 11px;
+    height: 11px;
+}
+
+.gadget__tarea-texto {
+    flex: 1;
+    min-width: 0;
+}
+
+.gadget__tarea-titulo {
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.gadget__tarea-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 1px;
+    font-size: 0.62rem;
+    color: var(--texto-tenue);
+}
+
+.gadget__tarea-color {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.gadget__tarea.completada .gadget__tarea-titulo {
+    color: var(--texto-tenue);
+}
+
+.gadget__tarea.completada .gadget__tarea-titulo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 55%;
+    height: 1.5px;
+    background: currentColor;
+    animation: tachadoSuave 380ms var(--transicion-suave) forwards;
+}
+
+.gadget__vacio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: var(--texto-tenue);
+    text-align: center;
+    padding: 10px;
+}
+
+.gadget__vacio svg {
+    width: 26px;
+    height: 26px;
+    opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Controles inferiores (opacidad)
+   -------------------------------------------------------------------------- */
+.gadget__controles {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 14px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    background: rgba(var(--gadget-rgb), 0.9);
+    border: 1px solid var(--cristal-borde);
+    box-shadow: var(--sombra-suave);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-size: 0.62rem;
+    color: var(--texto-tenue);
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-suave);
+}
+
+.gadget:hover .gadget__controles,
+.gadget__controles:focus-within {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.gadget__controles-etiqueta {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.58rem;
+    white-space: nowrap;
+}
+
+/* Control deslizante personalizado. */
+.gadget__deslizador {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        var(--acento) 0%,
+        var(--acento-secundario) var(--porcentaje-opacidad, 92%),
+        color-mix(in srgb, var(--texto-tenue) 20%, transparent) var(--porcentaje-opacidad, 92%)
+    );
+    outline: none;
+    cursor: pointer;
+}
+
+.gadget__deslizador::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--acento);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform var(--duracion-media) var(--transicion-rebote);
+}
+
+.gadget__deslizador:hover::-webkit-slider-thumb {
+    transform: scale(1.22);
+}
+
+.gadget__valor-opacidad {
+    min-width: 32px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--texto-secundario);
+}
+
+/* --------------------------------------------------------------------------
+   Modo compacto: solo cabecera, progreso y cuenta atrás esencial
+   -------------------------------------------------------------------------- */
+.gadget.compacto {
+    padding-bottom: 16px;
+}
+
+.gadget.compacto .gadget__tareas,
+.gadget.compacto .gadget__controles,
+.gadget.compacto .gadget__hito-barra {
+    display: none;
+}
+
+.gadget.compacto .gadget__cuenta-atras {
+    margin-bottom: 0;
+    padding: 11px 13px;
+}
+
+.gadget.compacto .gadget__hito-titulo {
+    margin-bottom: 7px;
+    font-size: 0.8rem;
+}
+
+.gadget.compacto .gadget__tiempo strong {
+    font-size: 0.94rem;
+}
+
+.gadget.compacto .gadget__progreso {
+    padding: 9px 12px;
+    margin-bottom: 9px;
+}
+
+.gadget.compacto .gadget__anillo,
+.gadget.compacto .gadget__anillo svg {
+    width: 44px;
+    height: 44px;
+}
+
+/* Modo bloqueado: el contorno se vuelve ámbar y la cabecera no invita a arrastrar. */
+.gadget.bloqueado {
+    border-color: color-mix(in srgb, var(--color-aviso) 40%, var(--cristal-borde));
+}
+
+.gadget.bloqueado .gadget__bloqueo-indicador {
+    display: inline-flex;
+}
+
+.gadget__bloqueo-indicador {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-aviso);
+    margin-top: 2px;
+}
+
+/* En modo compacto la cabecera necesita algo menos de altura. */
+.gadget.compacto .gadget__saludo {
+    font-size: 1.05rem;
+}

@@ -297,6 +297,28 @@ def sembrar_demostracion(gestor: GestorBaseDatos, forzar: bool = False) -> bool:
                 eventos.alternar_subtarea(subtarea["id"], True)
 
     # ------------------------------------------------------------------
+    # Tareas personales del día (para que el gadget tenga plan real)
+    # ------------------------------------------------------------------
+    tareas_hoy = [
+        ("Repasar árboles AVL", "Estructuras de Datos", 0, 19, 0, False),
+        ("Preparar preguntas para tutoría", "Sistemas Operativos", 0, 17, 30, True),
+        ("Revisar apuntes de índices", "Bases de Datos", 0, 20, 0, False),
+    ]
+    for titulo, nombre_asignatura, dias, hora, minuto, completada in tareas_hoy:
+        tarea = eventos.crear(
+            titulo=titulo,
+            tipo="tarea",
+            fecha_inicio=_fecha_hora(base, dias, hora, minuto),
+            fecha_fin=_fecha_hora(base, dias, hora + 1, minuto),
+            asignatura_id=por_nombre[nombre_asignatura]["id"],
+            prioridad="media",
+            descripcion="Tarea personal del plan de hoy.",
+            recordatorios=[60],
+        )
+        if completada:
+            eventos.marcar_completado(tarea["id"], True)
+
+    # ------------------------------------------------------------------
     # Evaluaciones y notas
     # ------------------------------------------------------------------
     plan_evaluacion = {
