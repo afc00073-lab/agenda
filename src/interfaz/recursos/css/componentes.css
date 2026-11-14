@@ -1550,3 +1550,70 @@ html[data-tema="luz-pura"] .campo__control {
         font-size: var(--tamano-texto-lg);
     }
 }
+
+/* --------------------------------------------------------------------------
+   13. Comportamiento del armazón de la aplicación
+   -------------------------------------------------------------------------- */
+/* Cada vista entra con un fundido y una escala muy leve. */
+.vista {
+    animation: aparecerEscala 420ms var(--transicion-suave) both;
+}
+
+/* El modal aparece con el mismo lenguaje de movimiento que las vistas. */
+.modal-fondo {
+    animation: fundidoEntrada 220ms var(--transicion-rapida) both;
+}
+
+.modal-fondo .modal {
+    animation: aparecerEscala 360ms var(--transicion-suave) both;
+}
+
+.modal-fondo.cerrando {
+    opacity: 0;
+    animation: none;
+    transition: opacity 180ms var(--transicion-rapida);
+}
+
+.modal-fondo.cerrando .modal {
+    transform: scale(0.96) translateY(8px);
+    transition: transform 180ms var(--transicion-rapida);
+}
+
+/* Los enlaces de navegación son botones: heredan tipografía y alineación. */
+.navegacion__enlace {
+    width: 100%;
+    text-align: left;
+}
+
+/* El contador desaparece cuando no hay elementos, sin romper el alineado. */
+.navegacion__contador.oculto {
+    display: none;
+}
+
+/* La barra superior cede espacio en pantallas medianas sin perder acciones. */
+@media (max-width: 1240px) {
+    .barra-superior {
+        padding-left: var(--espacio-5);
+        padding-right: var(--espacio-5);
+    }
+
+    .contenido {
+        padding-left: var(--espacio-5);
+        padding-right: var(--espacio-5);
+    }
+
+    #boton-nueva-tarea {
+        padding: 0 var(--espacio-3);
+    }
+}
+
+@media (max-width: 1080px) {
+    .selector-tema {
+        display: none;
+    }
+}
+
+/* En modo colapsado los tooltips sustituyen a las etiquetas ocultas. */
+.barra-lateral.colapsada .navegacion__enlace {
+    position: relative;
+}

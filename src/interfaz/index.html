@@ -3,54 +3,215 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
   <title>Agenda Académica Inteligente</title>
+  <link rel="icon" href="recursos/img/icono.svg" type="image/svg+xml">
   <link rel="stylesheet" href="recursos/css/variables.css">
   <link rel="stylesheet" href="recursos/css/temas.css">
   <link rel="stylesheet" href="recursos/css/animaciones.css">
   <link rel="stylesheet" href="recursos/css/componentes.css">
   <link rel="stylesheet" href="recursos/css/vistas.css">
-  <style>
-    html, body { height: 100%; margin: 0; }
-    body {
-      display: grid;
-      place-items: center;
-      background: var(--fondo-principal);
-      color: var(--texto-principal);
-      font-family: var(--fuente-principal);
-      overflow: hidden;
-    }
-    .arranque {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 18px;
-      padding: 46px 58px;
-      border-radius: var(--radio-grande);
-      background: var(--cristal-fondo);
-      border: 1px solid var(--cristal-borde);
-      box-shadow: var(--sombra-elevada);
-      animation: aparecerEscala 0.6s var(--transicion-suave) both;
-    }
-    .arranque img { width: 88px; height: 88px; animation: flotar 3.6s ease-in-out infinite; }
-    .arranque h1 { margin: 0; font-size: 1.35rem; letter-spacing: 0.02em; }
-    .arranque p { margin: 0; color: var(--texto-secundario); font-size: 0.9rem; }
-    .puntos { display: flex; gap: 8px; }
-    .puntos span {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--acento);
-      animation: latido 1.2s ease-in-out infinite;
-    }
-    .puntos span:nth-child(2) { animation-delay: 0.15s; }
-    .puntos span:nth-child(3) { animation-delay: 0.3s; }
-  </style>
 </head>
 <body>
-  <main class="arranque">
-    <img src="recursos/img/icono.svg" alt="Agenda Académica">
-    <h1>Agenda Académica Inteligente</h1>
-    <p>Preparando tu plan de estudios…</p>
-    <div class="puntos" aria-hidden="true"><span></span><span></span><span></span></div>
-  </main>
+  <div class="aplicacion" id="aplicacion">
+
+    <!-- ================================================================
+         Barra lateral: marca, navegación principal y tarjeta de enfoque
+         ================================================================ -->
+    <aside class="barra-lateral" id="barra-lateral">
+      <button class="boton-colapsar" id="boton-colapsar" type="button"
+              aria-label="Colapsar barra lateral" data-tooltip="Colapsar menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>
+        </svg>
+      </button>
+
+      <div class="marca">
+        <span class="marca__logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="16" rx="3"/>
+            <path d="M8 2.5v4M16 2.5v4M3 9.5h18"/>
+            <path d="m8.6 14.2 2.2 2.2 4.4-4.6"/>
+          </svg>
+        </span>
+        <span class="marca__texto">
+          <span class="marca__nombre">Agenda Académica</span>
+          <span class="marca__lema">Inteligente</span>
+        </span>
+      </div>
+
+      <nav class="navegacion" aria-label="Vistas principales">
+        <button class="navegacion__enlace activo" type="button" data-vista="inicio" aria-current="page">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <path d="m3 10.5 9-7 9 7V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-6v6H4.5A1.5 1.5 0 0 1 3 20Z"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Inicio</span>
+          <span class="navegacion__contador" id="contador-hoy">0</span>
+        </button>
+
+        <button class="navegacion__enlace" type="button" data-vista="calendario">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4.5" width="18" height="16" rx="3"/>
+              <path d="M8 2.5v4M16 2.5v4M3 9.5h18"/>
+              <path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17.5h.01M12 17.5h.01"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Calendario</span>
+        </button>
+
+        <button class="navegacion__enlace" type="button" data-vista="kanban">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3.5" width="5.4" height="17" rx="1.8"/>
+              <rect x="10.3" y="3.5" width="5.4" height="11" rx="1.8"/>
+              <rect x="17.6" y="3.5" width="3.4" height="14" rx="1.6"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Kanban</span>
+          <span class="navegacion__contador" id="contador-kanban">0</span>
+        </button>
+
+        <button class="navegacion__enlace" type="button" data-vista="asignaturas">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 6.6C10.5 5.1 8.6 4.4 6 4.4c-1.2 0-2.3.2-3 .5v14c.7-.3 1.8-.5 3-.5 2.6 0 4.5.7 6 2.2 1.5-1.5 3.4-2.2 6-2.2 1.2 0 2.3.2 3 .5v-14c-.7-.3-1.8-.5-3-.5-2.6 0-4.5.7-6 2.2Z"/>
+              <path d="M12 6.6v14.4"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Asignaturas</span>
+        </button>
+
+        <button class="navegacion__enlace" type="button" data-vista="estudio">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="13.2" r="7.8"/>
+              <path d="M12 9.4v4.2l2.6 1.7M9 2.2h6M12 2.2v2.6"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Pomodoro</span>
+        </button>
+
+        <button class="navegacion__enlace" type="button" data-vista="analiticas">
+          <span class="navegacion__icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <path d="M3.5 20.5V11M9.5 20.5V4M15.5 20.5v-6.5M21.5 20.5H2.5"/>
+              <path d="m4 7 5-3 6 4 5-5"/>
+            </svg>
+          </span>
+          <span class="navegacion__texto">Analíticas</span>
+        </button>
+      </nav>
+
+      <div class="barra-lateral__pie">
+        <nav class="navegacion" aria-label="Configuración">
+          <button class="navegacion__enlace" type="button" data-vista="ajustes">
+            <span class="navegacion__icono">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                   stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 7h9M18 7h2M4 17h2M11 17h9"/>
+                <circle cx="15.5" cy="7" r="2.3"/>
+                <circle cx="8.5" cy="17" r="2.3"/>
+              </svg>
+            </span>
+            <span class="navegacion__texto">Ajustes</span>
+          </button>
+        </nav>
+
+        <div class="tarjeta-enfoque" id="tarjeta-enfoque">
+          <p class="tarjeta-enfoque__titulo">Enfoque semanal</p>
+          <p class="tarjeta-enfoque__valor" id="enfoque-valor">0 h</p>
+          <p class="tarjeta-enfoque__detalle" id="enfoque-detalle">Aún no hay sesiones registradas.</p>
+        </div>
+
+        <p class="texto-tenue" style="font-size:0.66rem;letter-spacing:0.08em;text-transform:uppercase">
+          Versión 1.0 · SQLite WAL
+        </p>
+      </div>
+    </aside>
+
+    <!-- ================================================================
+         Contenido principal
+         ================================================================ -->
+    <main class="contenido-principal">
+      <header class="barra-superior">
+        <div class="barra-superior__saludo">
+          <h1 class="barra-superior__titulo" id="titulo-vista">Buenos días</h1>
+          <p class="barra-superior__subtitulo" id="subtitulo-vista">Preparando tu plan de estudios…</p>
+        </div>
+
+        <div class="barra-superior__acciones">
+          <button class="boton boton--primario" type="button" id="boton-nueva-tarea">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Nueva tarea
+          </button>
+
+          <div class="selector-tema" role="group" aria-label="Elegir tema visual">
+            <button class="selector-tema__opcion activa" type="button" data-tema-opcion="cristal-medianoche"
+                    aria-label="Tema Cristal Medianoche" data-tooltip="Cristal Medianoche"></button>
+            <button class="selector-tema__opcion" type="button" data-tema-opcion="noche-nordica"
+                    aria-label="Tema Noche Nórdica" data-tooltip="Noche Nórdica"></button>
+            <button class="selector-tema__opcion" type="button" data-tema-opcion="luz-pura"
+                    aria-label="Tema Luz Pura" data-tooltip="Luz Pura"></button>
+          </div>
+
+          <div class="campana">
+            <button class="boton-icono" type="button" id="boton-campana"
+                    aria-label="Avisos: todo al día" data-tooltip="Avisos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 9.2a6 6 0 1 0-12 0c0 4.8-2.2 6.1-2.2 6.1h16.4S18 14 18 9.2Z"/>
+                <path d="M10.2 19.6a2.1 2.1 0 0 0 3.6 0"/>
+              </svg>
+              <span class="insignia-alerta" id="insignia-campana">0</span>
+            </button>
+
+            <div class="menu-desplegable oculto" id="menu-notificaciones">
+              <div class="menu-desplegable__cabecera">
+                <span class="menu-desplegable__titulo">Recordatorios</span>
+                <button class="boton boton--fantasma boton--pequeno" type="button"
+                        id="marcar-todas-notificaciones">Marcar todas</button>
+              </div>
+              <div class="menu-desplegable__lista" id="lista-notificaciones"></div>
+              <div class="menu-desplegable__pie">
+                <button class="boton boton--fantasma boton--pequeno" type="button"
+                        id="ver-todas-notificaciones">Ir al panel de avisos</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="avatar" type="button" id="avatar-estudiante" data-tooltip="Tu perfil"
+                  aria-label="Abrir ajustes del perfil">ES</button>
+        </div>
+      </header>
+
+      <div class="contenido" id="contenido">
+        <div class="contenido__interior" id="vista-contenedor" aria-live="polite"></div>
+      </div>
+    </main>
+
+    <!-- Contenedor de modales y avisos flotantes -->
+    <div id="contenedor-modal"></div>
+    <div class="toast-contenedor" id="toasts" aria-live="polite" aria-atomic="false"></div>
+  </div>
+
   <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+  <script src="recursos/js/puente.js"></script>
+  <script src="recursos/js/utilidades.js"></script>
+  <script src="recursos/js/notificaciones_internas.js"></script>
+  <script src="recursos/js/aplicacion.js"></script>
 </body>
 </html>
