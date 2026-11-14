@@ -1,0 +1,76 @@
+# ============================================================
+#  Agenda Académica Inteligente — reglas de exclusión de Git
+# ============================================================
+
+# --- Entornos virtuales y cachés de Python ---
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+develop-eggs/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+
+# --- Herramientas de pruebas y cobertura ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.tox/
+.nox/
+
+# --- Herramientas de tipado y calidad ---
+.mypy_cache/
+.dmypy.json
+.ruff_cache/
+.pyre/
+.pytype/
+
+# --- Bases de datos locales y respaldos ---
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+datos/
+respaldos/
+*.zip
+!requisitos*.txt
+
+# --- Registros y archivos temporales ---
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# --- Configuración local del editor ---
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# --- Entornos y secretos ---
+.env
+.env.*
+*.pem
+*.key
+
+# --- Capturas generadas durante el desarrollo ---
+capturas/

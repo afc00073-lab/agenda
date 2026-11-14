@@ -1,0 +1,18 @@
+# ==========================================================
+#  Dependencias de la Agenda Académica Inteligente
+#  Versiones mínimas probadas sobre Python 3.11+
+# ==========================================================
+
+# Interfaz nativa, motor web y puente de comunicación
+PySide6>=6.6,<7.0
+
+# Notificaciones nativas multiplataforma con acciones
+desktop-notifier>=4.0; sys_platform != "win32"
+winotify>=1.1; sys_platform == "win32"
+
+# Lectura y generación de calendarios iCalendar (.ics)
+icalendar>=5.0
+
+# Calidad y pruebas
+pytest>=7.4
+pytest-cov>=4.1
