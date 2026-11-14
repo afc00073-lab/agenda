@@ -1,0 +1,187 @@
+/* ==========================================================================
+   VISTAS · Agenda Académica Inteligente
+   --------------------------------------------------------------------------
+   Estilos compartidos por las seis pantallas y, a continuación, reglas
+   específicas de cada una. Este archivo se amplía con cada vista nueva para
+   mantener el sistema modular y legible.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Estructura común de secciones y rejillas
+   -------------------------------------------------------------------------- */
+.seccion {
+    margin-bottom: var(--espacio-7);
+}
+
+.seccion:last-child {
+    margin-bottom: 0;
+}
+
+.seccion__cabecera {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--espacio-4);
+    margin-bottom: var(--espacio-4);
+}
+
+.seccion__titulo {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-2);
+    font-size: var(--tamano-texto-md);
+    font-weight: var(--peso-fuerte);
+    letter-spacing: -0.025em;
+}
+
+.seccion__titulo svg {
+    width: 18px;
+    height: 18px;
+    color: var(--acento-secundario);
+}
+
+.seccion__descripcion {
+    margin-top: 2px;
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+}
+
+.rejilla {
+    display: grid;
+    gap: var(--espacio-4);
+}
+
+.rejilla--kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.rejilla--dos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rejilla--tres {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rejilla--lateral {
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.9fr);
+    align-items: start;
+}
+
+.rejilla--auto {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* Filas de datos reutilizables (listas de eventos, ajustes, etc.). */
+.fila-datos {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-3);
+    padding: var(--espacio-3) var(--espacio-2);
+    border-radius: var(--radio-pequeno);
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-suave);
+}
+
+.fila-datos:hover {
+    background: color-mix(in srgb, var(--texto-primario) 4%, transparent);
+    transform: translateX(2px);
+}
+
+.fila-datos + .fila-datos {
+    border-top: 1px solid color-mix(in srgb, var(--cristal-borde) 65%, transparent);
+}
+
+.fila-datos__principal {
+    flex: 1;
+    min-width: 0;
+}
+
+.fila-datos__titulo {
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-medio);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fila-datos__detalle {
+    font-size: var(--tamano-texto-xs);
+    color: var(--texto-tenue);
+    margin-top: 1px;
+}
+
+.fila-datos__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-2);
+    flex: 0 0 auto;
+}
+
+/* Cabecera de cifras grandes. */
+.cifra {
+    font-family: var(--fuente-principal);
+    font-size: var(--tamano-texto-2xl);
+    font-weight: var(--peso-titulo);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.cifra--pequena {
+    font-size: var(--tamano-texto-lg);
+}
+
+.cifra__unidad {
+    font-size: var(--tamano-texto-sm);
+    font-weight: var(--peso-medio);
+    color: var(--texto-tenue);
+    letter-spacing: 0;
+    margin-left: 3px;
+}
+
+/* Píldora de variación positiva/negativa. */
+.variacion {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: var(--tamano-texto-xs);
+    font-weight: var(--peso-semi);
+    color: var(--color-exito);
+}
+
+.variacion--negativa {
+    color: var(--color-peligro);
+}
+
+.variacion svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Adaptación de las rejillas
+   -------------------------------------------------------------------------- */
+@media (max-width: 1280px) {
+    .rejilla--kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1080px) {
+    .rejilla--lateral,
+    .rejilla--tres {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .rejilla--kpis,
+    .rejilla--dos {
+        grid-template-columns: 1fr;
+    }
+
+    .rejilla--auto {
+        grid-template-columns: 1fr;
+    }
+}

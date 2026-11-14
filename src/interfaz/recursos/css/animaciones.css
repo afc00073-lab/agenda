@@ -1,0 +1,491 @@
+/* ==========================================================================
+   ANIMACIONES · Agenda Académica Inteligente
+   --------------------------------------------------------------------------
+   Todas las transiciones se declaran aquí para mantener una coreografía
+   coherente: misma curva, mismas duraciones y sensación de continuidad entre
+   vistas. Se usan exclusivamente propiedades aceleradas por GPU (transform,
+   opacity) salvo en barras de progreso y tachados, donde la anchura es
+   imprescindible.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Fotogramas clave reutilizables
+   -------------------------------------------------------------------------- */
+@keyframes deslizarAparecer {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 22px, 0) scale(0.985);
+        filter: blur(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes deslizarDesdeIzquierda {
+    from {
+        opacity: 0;
+        transform: translate3d(-28px, 0, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes deslizarDesdeDerecha {
+    from {
+        opacity: 0;
+        transform: translate3d(32px, 0, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes aparecerEscala {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(14px);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.012) translateY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes fundidoEntrada {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes flotar {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(0, -9px, 0);
+    }
+}
+
+@keyframes pulsoAlerta {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-peligro) 55%, transparent);
+    }
+    55% {
+        box-shadow: 0 0 0 9px color-mix(in srgb, var(--color-peligro) 0%, transparent);
+    }
+}
+
+@keyframes latido {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.16);
+    }
+    55% {
+        transform: scale(0.96);
+    }
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes brilloBarrido {
+    from {
+        background-position: -220% 0;
+    }
+    to {
+        background-position: 220% 0;
+    }
+}
+
+@keyframes toastEntrada {
+    from {
+        opacity: 0;
+        transform: translate3d(42px, -6px, 0) scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes toastSalida {
+    to {
+        opacity: 0;
+        transform: translate3d(48px, 0, 0) scale(0.94);
+    }
+}
+
+@keyframes temblor {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-5px);
+    }
+    40% {
+        transform: translateX(5px);
+    }
+    60% {
+        transform: translateX(-3px);
+    }
+    80% {
+        transform: translateX(3px);
+    }
+}
+
+@keyframes tachadoSuave {
+    from {
+        width: 0;
+        opacity: 0.2;
+    }
+    to {
+        width: 100%;
+        opacity: 1;
+    }
+}
+
+@keyframes trazoReloj {
+    from {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes ondaSuave {
+    0%,
+    100% {
+        border-radius: 46% 54% 58% 42% / 48% 44% 56% 52%;
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        border-radius: 58% 42% 46% 54% / 54% 58% 42% 46%;
+        transform: rotate(180deg) scale(1.04);
+    }
+}
+
+@keyframes destello {
+    0%,
+    100% {
+        opacity: 0.35;
+    }
+    50% {
+        opacity: 0.85;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. Transiciones entre las seis vistas principales
+   -------------------------------------------------------------------------- */
+.vista {
+    display: none;
+    width: 100%;
+    min-height: 0;
+}
+
+.vista.activa {
+    display: block;
+    animation: deslizarAparecer var(--duracion-lenta) var(--transicion-suave) both;
+}
+
+.vista.activa > * {
+    animation: deslizarAparecer 640ms var(--transicion-suave) both;
+}
+
+.vista.activa > *:nth-child(2) {
+    animation-delay: 70ms;
+}
+
+.vista.activa > *:nth-child(3) {
+    animation-delay: 130ms;
+}
+
+/* Entradas escalonadas dentro de una cuadrícula o lista. */
+.animar-entrada {
+    animation: deslizarAparecer 620ms var(--transicion-suave) both;
+    animation-delay: var(--retraso, 0ms);
+}
+
+/* --------------------------------------------------------------------------
+   3. Tarjetas: elevación y halo al pasar el ratón
+   -------------------------------------------------------------------------- */
+.tarjeta {
+    transition: transform var(--duracion-media) var(--transicion-suave),
+        box-shadow var(--duracion-media) var(--transicion-suave),
+        border-color var(--duracion-media) var(--transicion-suave),
+        background-color var(--duracion-lenta) var(--transicion-suave);
+    will-change: transform;
+}
+
+.tarjeta:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--acento) 34%, var(--cristal-borde));
+    box-shadow: var(--sombra-media);
+}
+
+.tarjeta:active {
+    transform: translateY(-1px) scale(0.997);
+}
+
+/* Elevación suave de los elementos interactivos pequeños. */
+.elevable {
+    transition: transform var(--duracion-media) var(--transicion-suave),
+        box-shadow var(--duracion-media) var(--transicion-suave),
+        background-color var(--duracion-media) var(--transicion-suave);
+}
+
+.elevable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-suave);
+}
+
+/* --------------------------------------------------------------------------
+   4. Modales
+   -------------------------------------------------------------------------- */
+.modal-fondo {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--duracion-media) var(--transicion-suave),
+        visibility var(--duracion-media) var(--transicion-suave);
+}
+
+.modal-fondo.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-fondo .modal {
+    transform: translateY(26px) scale(0.96);
+    opacity: 0;
+    transition: transform var(--duracion-media) var(--transicion-rebote),
+        opacity var(--duracion-media) var(--transicion-suave);
+}
+
+.modal-fondo.visible .modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.modal-fondo.cerrando {
+    opacity: 0;
+}
+
+.modal-fondo.cerrando .modal {
+    transform: translateY(18px) scale(0.97);
+}
+
+/* --------------------------------------------------------------------------
+   5. Paneles laterales deslizables (detalle de evento y campana)
+   -------------------------------------------------------------------------- */
+.panel-lateral {
+    transform: translateX(105%);
+    opacity: 0;
+    transition: transform var(--duracion-lenta) var(--transicion-suave),
+        opacity var(--duracion-media) var(--transicion-suave);
+    will-change: transform;
+}
+
+.panel-lateral.abierto {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.desplegable {
+    transform-origin: top right;
+    transform: translateY(-8px) scale(0.96);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform var(--duracion-media) var(--transicion-rebote),
+        opacity var(--duracion-rapida) var(--transicion-suave),
+        visibility var(--duracion-media);
+}
+
+.desplegable.abierto {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --------------------------------------------------------------------------
+   6. Tareas completadas: tachado progresivo y verificación
+   -------------------------------------------------------------------------- */
+.tarea__titulo {
+    position: relative;
+    display: inline-block;
+    transition: color var(--duracion-media) var(--transicion-suave);
+}
+
+.tarea__titulo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 52%;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0;
+}
+
+.tarea-completada .tarea__titulo {
+    color: var(--texto-tenue);
+}
+
+.tarea-completada .tarea__titulo::after {
+    animation: tachadoSuave 420ms var(--transicion-suave) forwards;
+}
+
+.marca-verificacion {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radio-completo);
+    border: 1.5px solid var(--cristal-borde);
+    color: transparent;
+    transition: background-color var(--duracion-media) var(--transicion-suave),
+        border-color var(--duracion-media) var(--transicion-suave),
+        color var(--duracion-media) var(--transicion-suave),
+        transform var(--duracion-media) var(--transicion-rebote);
+}
+
+.marca-verificacion.activa {
+    background: var(--gradiente-acento);
+    border-color: transparent;
+    color: #06101a;
+    transform: scale(1.05);
+    animation: latido 420ms var(--transicion-rebote);
+}
+
+.marca-verificacion svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 3;
+}
+
+/* --------------------------------------------------------------------------
+   7. Barras de progreso y anillos
+   -------------------------------------------------------------------------- */
+.barra-progreso {
+    position: relative;
+    overflow: hidden;
+    height: 8px;
+    border-radius: var(--radio-completo);
+    background: color-mix(in srgb, var(--texto-tenue) 20%, transparent);
+}
+
+.barra-progreso__relleno {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: var(--gradiente-acento);
+    transition: width 900ms var(--transicion-suave);
+    position: relative;
+}
+
+.barra-progreso__relleno::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.42) 50%,
+        transparent 80%
+    );
+    background-size: 220% 100%;
+    animation: brilloBarrido 2.8s linear infinite;
+    mix-blend-mode: screen;
+}
+
+.anillo-progreso__valor {
+    transition: stroke-dashoffset 1s var(--transicion-suave), stroke var(--duracion-lenta) var(--transicion-suave);
+}
+
+/* --------------------------------------------------------------------------
+   8. Notificaciones internas (toasts)
+   -------------------------------------------------------------------------- */
+.toast {
+    animation: toastEntrada 520ms var(--transicion-suave) both;
+    will-change: transform, opacity;
+}
+
+.toast.saliendo {
+    animation: toastSalida 340ms var(--transicion-rapida) both;
+}
+
+/* --------------------------------------------------------------------------
+   9. Contador de alertas y elementos vivos
+   -------------------------------------------------------------------------- */
+.insignia-alerta.activa {
+    animation: pulsoAlerta 2.4s var(--transicion-suave) infinite;
+}
+
+.punto-vivo {
+    animation: destello 2.4s ease-in-out infinite;
+}
+
+.icono-girando {
+    animation: girar 900ms linear infinite;
+}
+
+.icono-latido:hover svg {
+    animation: latido 480ms var(--transicion-rebote);
+}
+
+.latido {
+    animation: latido 700ms var(--transicion-rebote);
+}
+
+/* --------------------------------------------------------------------------
+   10. Arrastrar y soltar
+   -------------------------------------------------------------------------- */
+.arrastrando {
+    opacity: 0.55;
+    transform: scale(0.98) rotate(-0.6deg);
+    box-shadow: var(--sombra-elevada);
+}
+
+.zona-soltar-activa {
+    border-color: var(--acento) !important;
+    background: color-mix(in srgb, var(--acento) 12%, var(--cristal-fondo)) !important;
+    box-shadow: 0 0 0 1px var(--acento), 0 12px 36px color-mix(in srgb, var(--acento) 22%, transparent);
+}
+
+.soltado {
+    animation: aparecerEscala 420ms var(--transicion-rebote) both;
+}
+
+/* --------------------------------------------------------------------------
+   11. Accesibilidad: respetar la preferencia de movimiento reducido
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

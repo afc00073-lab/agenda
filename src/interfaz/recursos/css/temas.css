@@ -1,0 +1,152 @@
+/* ==========================================================================
+   TEMAS · Agenda Académica Inteligente
+   --------------------------------------------------------------------------
+   Tres paletas completas que se intercambian en vivo cambiando el atributo
+   `data-tema` del elemento <html>. Todas las superficies usan color-mix() y
+   transiciones lentas para que el cambio se perciba como un fundido suave, no
+   como un parpadeo.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   TEMA 1 · CRISTAL MEDIANOCHE
+   Oscuro profundo con cristal esmerilado y acentos neón violeta-cian.
+   -------------------------------------------------------------------------- */
+html[data-tema="cristal-medianoche"] {
+    color-scheme: dark;
+
+    --fondo-principal: #060a14;
+    --fondo-secundario: #0a1020;
+    --fondo-terciario: #111a30;
+    --velo-fondo: rgba(4, 7, 15, 0.6);
+
+    --cristal-fondo: rgba(17, 25, 46, 0.58);
+    --cristal-fondo-fuerte: rgba(18, 27, 49, 0.9);
+    --cristal-borde: rgba(255, 255, 255, 0.085);
+    --cristal-borde-activo: rgba(124, 108, 255, 0.55);
+
+    --texto-primario: #f3f5ff;
+    --texto-secundario: #a6afcd;
+    --texto-tenue: #6d7797;
+
+    --acento: #7c6cff;
+    --acento-secundario: #34e2c4;
+    --acento-suave: rgba(124, 108, 255, 0.16);
+    --gradiente-acento: linear-gradient(135deg, #8b7bff 0%, #4aa8ff 52%, #34e2c4 100%);
+    --gradiente-superficie: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.012));
+    --gradiente-fondo:
+        radial-gradient(1100px 720px at 10% -10%, rgba(124, 108, 255, 0.24), transparent 62%),
+        radial-gradient(920px 640px at 98% 8%, rgba(52, 226, 196, 0.13), transparent 58%),
+        radial-gradient(780px 580px at 46% 112%, rgba(74, 168, 255, 0.14), transparent 64%);
+    --sombra-elevada: 0 28px 80px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    --sombra-suave: 0 6px 18px rgba(0, 0, 0, 0.24);
+}
+
+/* --------------------------------------------------------------------------
+   TEMA 2 · NOCHE NÓRDICA
+   Azul pizarra relajante, contraste medio y acentos fríos. Pensado para
+   sesiones largas de estudio nocturno sin fatiga visual.
+   -------------------------------------------------------------------------- */
+html[data-tema="noche-nordica"] {
+    color-scheme: dark;
+
+    --fondo-principal: #0d1624;
+    --fondo-secundario: #122033;
+    --fondo-terciario: #1a2c45;
+    --velo-fondo: rgba(9, 18, 30, 0.55);
+
+    --cristal-fondo: rgba(24, 39, 60, 0.6);
+    --cristal-fondo-fuerte: rgba(25, 41, 63, 0.92);
+    --cristal-borde: rgba(190, 220, 255, 0.11);
+    --cristal-borde-activo: rgba(106, 168, 255, 0.55);
+
+    --texto-primario: #e6eefb;
+    --texto-secundario: #a9bdd6;
+    --texto-tenue: #748aa6;
+
+    --acento: #6aa8ff;
+    --acento-secundario: #7fd1c1;
+    --acento-suave: rgba(106, 168, 255, 0.16);
+    --gradiente-acento: linear-gradient(135deg, #7fa7ff 0%, #6aa8ff 45%, #7fd1c1 100%);
+    --gradiente-superficie: linear-gradient(160deg, rgba(210, 232, 255, 0.08), rgba(210, 232, 255, 0.012));
+    --gradiente-fondo:
+        radial-gradient(1000px 680px at 8% -12%, rgba(106, 168, 255, 0.2), transparent 60%),
+        radial-gradient(820px 600px at 100% 10%, rgba(127, 209, 193, 0.12), transparent 58%),
+        radial-gradient(760px 540px at 50% 110%, rgba(86, 120, 178, 0.16), transparent 64%);
+    --sombra-elevada: 0 26px 72px rgba(3, 10, 20, 0.5), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    --sombra-suave: 0 6px 18px rgba(3, 10, 20, 0.22);
+
+    --color-exito: #63d6b4;
+    --color-aviso: #f4c76a;
+    --color-peligro: #f2788d;
+    --color-informacion: #79b8ff;
+}
+
+/* --------------------------------------------------------------------------
+   TEMA 3 · LUZ PURA
+   Claro minimalista con superficies blancas translúcidas y tinta azulada.
+   -------------------------------------------------------------------------- */
+html[data-tema="luz-pura"] {
+    color-scheme: light;
+
+    --fondo-principal: #eef1f8;
+    --fondo-secundario: #f8f9fd;
+    --fondo-terciario: #ffffff;
+    --velo-fondo: rgba(238, 241, 248, 0.55);
+
+    --cristal-fondo: rgba(255, 255, 255, 0.68);
+    --cristal-fondo-fuerte: rgba(255, 255, 255, 0.94);
+    --cristal-borde: rgba(23, 33, 58, 0.08);
+    --cristal-borde-activo: rgba(91, 91, 214, 0.42);
+
+    --texto-primario: #1a2238;
+    --texto-secundario: #5b6580;
+    --texto-tenue: #8d97af;
+
+    --acento: #5b5bd6;
+    --acento-secundario: #0e9384;
+    --acento-suave: rgba(91, 91, 214, 0.1);
+    --gradiente-acento: linear-gradient(135deg, #6d6df0 0%, #4a8df0 55%, #12a594 100%);
+    --gradiente-superficie: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.45));
+    --gradiente-fondo:
+        radial-gradient(1000px 700px at 8% -10%, rgba(109, 109, 240, 0.18), transparent 60%),
+        radial-gradient(880px 620px at 100% 6%, rgba(18, 165, 148, 0.12), transparent 58%),
+        radial-gradient(760px 560px at 50% 112%, rgba(74, 141, 240, 0.13), transparent 64%);
+    --sombra-elevada: 0 26px 60px rgba(38, 52, 92, 0.16), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    --sombra-suave: 0 6px 18px rgba(38, 52, 92, 0.08);
+    --sombra-media: 0 14px 34px rgba(38, 52, 92, 0.12);
+
+    --color-exito: #0f9d77;
+    --color-aviso: #d9931f;
+    --color-peligro: #d64560;
+    --color-informacion: #2f7fe0;
+    --color-texto-sobre-acento: #ffffff;
+}
+
+/* Transición global de colores al cambiar de tema. */
+html,
+body,
+.barra-lateral,
+.barra-superior,
+.tarjeta,
+.panel,
+.modal,
+.menu-desplegable,
+.campo,
+.boton,
+.etiqueta,
+.navegacion__enlace,
+.gadget {
+    transition-property: background-color, background-image, border-color, color, box-shadow,
+        fill, stroke;
+    transition-duration: var(--duracion-lenta);
+    transition-timing-function: var(--transicion-suave);
+}
+
+/* En Luz Pura las sombras y los brillos deben ser más contenidos. */
+html[data-tema="luz-pura"] .brillo-decorativo {
+    opacity: 0.35;
+}
+
+html[data-tema="luz-pura"] .tarjeta::after {
+    opacity: 0.4;
+}

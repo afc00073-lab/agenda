@@ -1,0 +1,248 @@
+/* ==========================================================================
+   VARIABLES GLOBALES · Agenda Académica Inteligente
+   --------------------------------------------------------------------------
+   Este archivo define la "fuente de verdad" visual: tipografía, espaciados,
+   radios, sombras, curvas de animación y variables estructurales. Los temas de
+   `temas.css` sobrescriben únicamente las variables de color, de modo que toda
+   la interfaz cambia en vivo sin recargar la página.
+   ========================================================================== */
+
+:root {
+    /* ---- Tipografía -------------------------------------------------- */
+    --fuente-principal: "Inter", "Segoe UI Variable", "Segoe UI", "SF Pro Display",
+        system-ui, -apple-system, "Ubuntu", "Cantarell", sans-serif;
+    --fuente-monoespaciada: "JetBrains Mono", "Cascadia Code", "SFMono-Regular",
+        Consolas, monospace;
+
+    --tamano-texto-xs: 0.72rem;
+    --tamano-texto-sm: 0.82rem;
+    --tamano-texto-base: 0.94rem;
+    --tamano-texto-md: 1.05rem;
+    --tamano-texto-lg: 1.35rem;
+    --tamano-texto-xl: 1.8rem;
+    --tamano-texto-2xl: 2.4rem;
+    --tamano-texto-3xl: 3.2rem;
+
+    --peso-normal: 400;
+    --peso-medio: 500;
+    --peso-semi: 600;
+    --peso-fuerte: 700;
+    --peso-titulo: 800;
+
+    /* ---- Espaciado (escala de 4 px) ---------------------------------- */
+    --espacio-1: 4px;
+    --espacio-2: 8px;
+    --espacio-3: 12px;
+    --espacio-4: 16px;
+    --espacio-5: 20px;
+    --espacio-6: 24px;
+    --espacio-7: 32px;
+    --espacio-8: 40px;
+    --espacio-9: 56px;
+    --espacio-10: 72px;
+
+    /* ---- Radios ------------------------------------------------------- */
+    --radio-pequeno: 10px;
+    --radio-medio: 16px;
+    --radio-grande: 24px;
+    --radio-xl: 32px;
+    --radio-completo: 999px;
+
+    /* ---- Curvas y duraciones ----------------------------------------- */
+    --transicion-suave: cubic-bezier(0.22, 1, 0.36, 1);
+    --transicion-rapida: cubic-bezier(0.4, 0, 0.2, 1);
+    --transicion-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duracion-rapida: 160ms;
+    --duracion-media: 300ms;
+    --duracion-lenta: 520ms;
+
+    /* ---- Estructura --------------------------------------------------- */
+    --ancho-barra-lateral: 252px;
+    --ancho-barra-colapsada: 86px;
+    --altura-barra-superior: 76px;
+    --ancho-contenido-maximo: 1500px;
+
+    /* ---- Capas -------------------------------------------------------- */
+    --capa-fondo: 0;
+    --capa-contenido: 10;
+    --capa-lateral: 40;
+    --capa-superior: 50;
+    --capa-desplegable: 80;
+    --capa-modal: 100;
+    --capa-toast: 120;
+
+    /* ---- Opacidad del gadget (la modifica JavaScript en vivo) --------- */
+    --opacidad-gadget: 0.92;
+
+    /* ---- Colores semánticos (los temas los afinan) -------------------- */
+    --color-exito: #2dd4a8;
+    --color-aviso: #ffc857;
+    --color-peligro: #ff5f7a;
+    --color-informacion: #4aa8ff;
+    --color-texto-sobre-acento: #ffffff;
+
+    /* ---- Sombras y desenfoques --------------------------------------- */
+    --desenfoque-cristal: 22px;
+    --desenfoque-fuerte: 40px;
+    --sombra-suave: 0 6px 18px rgba(2, 6, 18, 0.18);
+    --sombra-media: 0 12px 34px rgba(2, 6, 18, 0.28);
+    --sombra-elevada: 0 24px 70px rgba(2, 6, 18, 0.45), 0 2px 0 rgba(255, 255, 255, 0.05) inset;
+    --sombra-brillo: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 46px rgba(0, 0, 0, 0.4);
+
+    /* ---- Colores base de respaldo (los sobrescribe cada tema) --------- */
+    --fondo-principal: #070b16;
+    --fondo-secundario: #0b1121;
+    --fondo-terciario: #111a30;
+    --cristal-fondo: rgba(17, 24, 44, 0.62);
+    --cristal-fondo-fuerte: rgba(20, 28, 52, 0.88);
+    --cristal-borde: rgba(255, 255, 255, 0.09);
+    --cristal-borde-activo: rgba(124, 108, 255, 0.55);
+    --texto-primario: #f2f4ff;
+    --texto-secundario: #a2abc9;
+    --texto-tenue: #6f7896;
+    --acento: #7c6cff;
+    --acento-secundario: #34e2c4;
+    --acento-suave: rgba(124, 108, 255, 0.16);
+    --gradiente-acento: linear-gradient(135deg, #7c6cff 0%, #4aa8ff 52%, #34e2c4 100%);
+    --gradiente-superficie: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015));
+    --gradiente-fondo: radial-gradient(1100px 700px at 12% -8%, rgba(124, 108, 255, 0.22), transparent 60%),
+        radial-gradient(900px 620px at 96% 12%, rgba(52, 226, 196, 0.12), transparent 58%),
+        radial-gradient(760px 560px at 48% 108%, rgba(74, 168, 255, 0.12), transparent 62%);
+    --velo-fondo: rgba(4, 7, 15, 0.62);
+}
+
+/* ==========================================================================
+   Reinicio moderno y accesibilidad
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: var(--fuente-principal);
+    font-size: var(--tamano-texto-base);
+    line-height: 1.55;
+    color: var(--texto-primario);
+    background-color: var(--fondo-principal);
+    background-image: var(--gradiente-fondo);
+    background-attachment: fixed;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: color var(--duracion-lenta) var(--transicion-suave),
+        background-color var(--duracion-lenta) var(--transicion-suave),
+        background-image var(--duracion-lenta) var(--transicion-suave);
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+a {
+    color: var(--acento-secundario);
+    text-decoration: none;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+/* Barra de desplazamiento sutil y coherente con cada tema. */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--texto-tenue) 42%, transparent);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: var(--radio-completo);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--acento) 60%, transparent);
+    background-clip: content-box;
+}
+
+::selection {
+    background: color-mix(in srgb, var(--acento) 45%, transparent);
+    color: #ffffff;
+}
+
+:focus-visible {
+    outline: 2px solid var(--acento-secundario);
+    outline-offset: 3px;
+}
+
+/* Utilidades espaciales reutilizables. */
+.solo-lectores {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.oculto {
+    display: none !important;
+}
+
+.invisible {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.texto-tenue {
+    color: var(--texto-tenue);
+}
+
+.texto-secundario {
+    color: var(--texto-secundario);
+}
+
+.texto-acento {
+    color: var(--acento-secundario);
+}
+
+.sin-seleccion {
+    user-select: none;
+    -webkit-user-select: none;
+}
