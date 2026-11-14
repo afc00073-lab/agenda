@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="cristal-medianoche">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agenda Académica Inteligente</title>
+  <link rel="stylesheet" href="recursos/css/variables.css">
+  <link rel="stylesheet" href="recursos/css/temas.css">
+  <link rel="stylesheet" href="recursos/css/animaciones.css">
+  <link rel="stylesheet" href="recursos/css/componentes.css">
+  <link rel="stylesheet" href="recursos/css/vistas.css">
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: grid;
+      place-items: center;
+      background: var(--fondo-principal);
+      color: var(--texto-principal);
+      font-family: var(--fuente-principal);
+      overflow: hidden;
+    }
+    .arranque {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: 46px 58px;
+      border-radius: var(--radio-grande);
+      background: var(--cristal-fondo);
+      border: 1px solid var(--cristal-borde);
+      box-shadow: var(--sombra-elevada);
+      animation: aparecerEscala 0.6s var(--transicion-suave) both;
+    }
+    .arranque img { width: 88px; height: 88px; animation: flotar 3.6s ease-in-out infinite; }
+    .arranque h1 { margin: 0; font-size: 1.35rem; letter-spacing: 0.02em; }
+    .arranque p { margin: 0; color: var(--texto-secundario); font-size: 0.9rem; }
+    .puntos { display: flex; gap: 8px; }
+    .puntos span {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--acento);
+      animation: latido 1.2s ease-in-out infinite;
+    }
+    .puntos span:nth-child(2) { animation-delay: 0.15s; }
+    .puntos span:nth-child(3) { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <main class="arranque">
+    <img src="recursos/img/icono.svg" alt="Agenda Académica">
+    <h1>Agenda Académica Inteligente</h1>
+    <p>Preparando tu plan de estudios…</p>
+    <div class="puntos" aria-hidden="true"><span></span><span></span><span></span></div>
+  </main>
+  <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</body>
+</html>
