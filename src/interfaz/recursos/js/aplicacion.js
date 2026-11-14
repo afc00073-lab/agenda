@@ -527,30 +527,30 @@
         }
         const definiciones = {
             tarea: {
-                titulo: "Nueva tarea",
+                titulo: datos.id ? "Editar tarea" : "Nueva tarea",
                 descripcion: "Añádela al tablero Kanban y recibe un recordatorio antes de la entrega.",
                 icono: "check",
                 ancho: false,
                 contenido: formularioTarea(datos),
-                guardar: "Crear tarea",
+                guardar: datos.id ? "Guardar cambios" : "Crear tarea",
                 alGuardar: guardarTarea
             },
             evento: {
-                titulo: "Nuevo evento",
+                titulo: datos.id ? "Editar evento" : "Nuevo evento",
                 descripcion: "Clases, exámenes, entregas o bloques de estudio con fecha y hora.",
                 icono: "calendario",
                 ancho: true,
                 contenido: formularioEvento(datos),
-                guardar: "Crear evento",
+                guardar: datos.id ? "Guardar cambios" : "Crear evento",
                 alGuardar: guardarEvento
             },
             asignatura: {
-                titulo: "Nueva asignatura",
+                titulo: datos.id ? "Editar asignatura" : "Nueva asignatura",
                 descripcion: "Cada materia agrupa sus eventos, evaluaciones y nota media.",
                 icono: "asignaturas",
                 ancho: false,
                 contenido: formularioAsignatura(datos),
-                guardar: "Crear asignatura",
+                guardar: datos.id ? "Guardar cambios" : "Crear asignatura",
                 alGuardar: guardarAsignatura
             }
         };
@@ -564,6 +564,10 @@
             return;
         }
         construirModal(tipo, definicion);
+        const formulario = $("#form-modal");
+        if (formulario && datos.id) {
+            formulario.dataset.registroId = String(datos.id);
+        }
     }
 
     /**
@@ -841,12 +845,20 @@
             fecha_fin: `${fecha}T${hora}`,
             asignatura_id: valor(formulario, "asignatura_id") || null,
             prioridad: valor(formulario, "prioridad") || "media",
-            descripcion: valor(formulario, "descripcion"),
-            estado_kanban: "pendiente",
-            recordatorios: [120, 15]
+            descripcion: valor(formulario, "descripcion")
         };
-        await global.PuenteAgenda.obtener("crear_evento", JSON.stringify(datos));
-        toast("Tarea creada", titulo, "exito");
+        const identificador = formulario.dataset.registroId;
+        if (identificador) {
+            await global.PuenteAgenda.obtener(
+                "actualizar_evento", Number(identificador), JSON.stringify(datos)
+            );
+            toast("Tarea actualizada", titulo, "exito");
+        } else {
+            datos.estado_kanban = "pendiente";
+            datos.recordatorios = [120, 15];
+            await global.PuenteAgenda.obtener("crear_evento", JSON.stringify(datos));
+            toast("Tarea creada", titulo, "exito");
+        }
         await recargarDatos(false);
         return true;
     }
@@ -872,8 +884,16 @@
             prioridad: valor(formulario, "prioridad") || "media",
             descripcion: valor(formulario, "descripcion")
         };
-        await global.PuenteAgenda.obtener("crear_evento", JSON.stringify(datos));
-        toast("Evento creado", `${titulo} · ${U.fechaCorta(fecha)}`, "exito");
+        const identificador = formulario.dataset.registroId;
+        if (identificador) {
+            await global.PuenteAgenda.obtener(
+                "actualizar_evento", Number(identificador), JSON.stringify(datos)
+            );
+            toast("Evento actualizado", titulo, "exito");
+        } else {
+            await global.PuenteAgenda.obtener("crear_evento", JSON.stringify(datos));
+            toast("Evento creado", `${titulo} · ${U.fechaCorta(fecha)}`, "exito");
+        }
         await recargarDatos(false);
         return true;
     }
@@ -893,8 +913,16 @@
             aula: valor(formulario, "aula"),
             color: valor(formulario, "color") || PALETA[0]
         };
-        await global.PuenteAgenda.obtener("crear_asignatura", JSON.stringify(datos));
-        toast("Asignatura creada", nombre, "exito");
+        const identificador = formulario.dataset.registroId;
+        if (identificador) {
+            await global.PuenteAgenda.obtener(
+                "actualizar_asignatura", Number(identificador), JSON.stringify(datos)
+            );
+            toast("Asignatura actualizada", nombre, "exito");
+        } else {
+            await global.PuenteAgenda.obtener("crear_asignatura", JSON.stringify(datos));
+            toast("Asignatura creada", nombre, "exito");
+        }
         await recargarDatos(false);
         return true;
     }
