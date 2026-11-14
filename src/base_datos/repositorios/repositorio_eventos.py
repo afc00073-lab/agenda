@@ -482,7 +482,16 @@ class RepositorioEventos(RepositorioBase):
             Evento actualizado o ``None`` si no existe.
         """
 
-        return self.actualizar(evento_id, {"completado": completado})
+        evento = self.obtener(evento_id)
+        if evento is None:
+            return None
+        cambios: dict[str, Any] = {"completado": completado}
+        if evento["tipo"] == "tarea":
+            if completado:
+                cambios["estado_kanban"] = "entregado"
+            elif evento.get("estado_kanban") == "entregado":
+                cambios["estado_kanban"] = "pendiente"
+        return self.actualizar(evento_id, cambios)
 
     def mover_kanban(self, evento_id: int, columna: str) -> dict[str, Any] | None:
         """Cambia la columna Kanban de una tarea.

@@ -762,6 +762,7 @@
         const temporales = valoresTemporales();
         return `
             <div class="formulario formulario--dos-columnas">
+                <input type="hidden" id="estado-kanban" name="estado_kanban" value="${escapar(datos.estado_kanban || "pendiente")}">
                 ${campo({ id: "titulo", etiqueta: "Título", valor: datos.titulo || "", requerido: true, ancho: true, placeholder: "Entregar práctica de estadística" })}
                 ${campo({ id: "asignatura_id", etiqueta: "Asignatura", valor: datos.asignatura_id || "", opciones: opcionesAsignaturas(datos.asignatura_id) })}
                 ${campo({ id: "prioridad", etiqueta: "Prioridad", valor: datos.prioridad || "media", opciones: OPCIONES_PRIORIDAD })}
@@ -845,7 +846,8 @@
             fecha_fin: `${fecha}T${hora}`,
             asignatura_id: valor(formulario, "asignatura_id") || null,
             prioridad: valor(formulario, "prioridad") || "media",
-            descripcion: valor(formulario, "descripcion")
+            descripcion: valor(formulario, "descripcion"),
+            estado_kanban: valor(formulario, "estado_kanban") || "pendiente"
         };
         const identificador = formulario.dataset.registroId;
         if (identificador) {
@@ -854,7 +856,6 @@
             );
             toast("Tarea actualizada", titulo, "exito");
         } else {
-            datos.estado_kanban = "pendiente";
             datos.recordatorios = [120, 15];
             await global.PuenteAgenda.obtener("crear_evento", JSON.stringify(datos));
             toast("Tarea creada", titulo, "exito");
