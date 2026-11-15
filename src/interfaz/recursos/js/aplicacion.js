@@ -552,6 +552,15 @@
                 contenido: formularioAsignatura(datos),
                 guardar: datos.id ? "Guardar cambios" : "Crear asignatura",
                 alGuardar: guardarAsignatura
+            },
+            evaluacion: {
+                titulo: datos.id ? "Editar evaluación" : "Nueva evaluación",
+                descripcion: "Añade el peso y la nota de cada prueba para calcular la media.",
+                icono: "nota",
+                ancho: false,
+                contenido: formularioEvaluacion(datos),
+                guardar: datos.id ? "Guardar cambios" : "Añadir evaluación",
+                alGuardar: guardarEvaluacion
             }
         };
         const definicion = definiciones[tipo];
@@ -823,9 +832,63 @@
             </div>`;
     }
 
+    /** Formulario de evaluación con peso y nota. */
+    function formularioEvaluacion(datos = {}) {
+        return `
+            <div class="formulario formulario--dos-columnas">
+                ${campo({ id: "asignatura_id", etiqueta: "Asignatura", valor: datos.asignatura_id || "", requerido: true, opciones: opcionesAsignaturas(datos.asignatura_id).filter((opcion) => opcion.valor !== "") })}
+                ${campo({
+                    id: "tipo",
+                    etiqueta: "Tipo",
+                    valor: datos.tipo || "examen",
+                    opciones: [
+                        { valor: "examen", etiqueta: "Examen" },
+                        { valor: "practica", etiqueta: "Práctica" },
+                        { valor: "proyecto", etiqueta: "Proyecto" },
+                        { valor: "participacion", etiqueta: "Participación" }
+                    ]
+                })}
+                ${campo({ id: "nombre", etiqueta: "Nombre", valor: datos.nombre || "", requerido: true, ancho: true, placeholder: "Examen parcial de Cálculo" })}
+                ${campo({ id: "peso", etiqueta: "Peso (%)", tipo: "number", valor: datos.peso ?? 20, requerido: true, minimo: 0, maximo: 100, paso: 1, ayuda: "Porcentaje sobre la nota final" })}
+                ${campo({ id: "nota", etiqueta: "Nota obtenida", tipo: "number", valor: datos.nota ?? "", minimo: 0, maximo: 10, paso: 0.1, ayuda: "Déjala vacía si aún no tienes calificación" })}
+                ${campo({ id: "nota_maxima", etiqueta: "Escala máxima", tipo: "number", valor: datos.nota_maxima ?? 10, minimo: 1, maximo: 100, paso: 0.1 })}
+                ${campo({ id: "fecha", etiqueta: "Fecha de la prueba", tipo: "date", valor: datos.fecha || "" })}
+            </div>`;
+    }
+
     /* ------------------------------------------------------------------
        Guardado
        ------------------------------------------------------------------ */
+    /** Guarda una evaluación nueva o editada. */
+    async function guardarEvaluacion(formulario) {
+        const nombre = valor(formulario, "nombre");
+        if (!nombre) {
+            toast("Falta el nombre", "Escribe el nombre de la evaluación.", "aviso");
+            return false;
+        }
+        const datos = {
+            asignatura_id: Number(valor(formulario, "asignatura_id")) || null,
+            nombre,
+            tipo: valor(formulario, "tipo") || "examen",
+            peso: Number(valor(formulario, "peso")) || 0,
+            nota: valor(formulario, "nota") === "" ? null : Number(valor(formulario, "nota")),
+            nota_maxima: Number(valor(formulario, "nota_maxima")) || 10,
+            fecha: valor(formulario, "fecha") || ""
+        };
+        const identificador = formulario.dataset.registroId;
+        if (identificador) {
+            await global.PuenteAgenda.obtener(
+                "actualizar_evaluacion", Number(identificador), JSON.stringify(datos)
+            );
+            toast("Evaluación actualizada", nombre, "exito");
+        } else {
+            await global.PuenteAgenda.obtener("crear_evaluacion", JSON.stringify(datos));
+            toast("Evaluación añadida", nombre, "exito");
+        }
+        await recargarDatos(false);
+        return true;
+    }
+
     /** Recoge el valor de un control del formulario. */
     const valor = (formulario, nombre) =>
         (formulario.elements[nombre]?.value ?? "").toString().trim();

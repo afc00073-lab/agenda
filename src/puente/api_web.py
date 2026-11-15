@@ -31,6 +31,7 @@ from PySide6.QtWidgets import QFileDialog
 from src.base_datos.contexto import ContextoDatos
 from src.configuracion import NOMBRE_APLICACION
 from src.servicios.calendario_ics import SincronizadorICS
+from src.servicios.calculadora_notas import calcular_asignatura, calcular_expediente
 from src.servicios.inicio_automatico import GestorInicioAutomatico
 from src.servicios.notificaciones import PlanificadorNotificaciones
 from src.servicios.pomodoro import GestorPomodoro
@@ -337,6 +338,142 @@ class ApiPuente(QObject):
         return self._responder(
             lambda: {"eliminada": self.contexto.asignaturas.eliminar(asignatura_id)},
             "notas",
+        )
+
+    # ------------------------------------------------------------------
+    # Evaluaciones y calculadora de notas
+    # ------------------------------------------------------------------
+    @Slot(int, result=str)
+    def listar_evaluaciones(self, asignatura_id: int) -> str:
+        """Lista las evaluaciones de una asignatura.
+
+        Args:
+            asignatura_id: Identificador de la asignatura.
+
+        Returns:
+            JSON con la lista de evaluaciones y el cálculo actualizado.
+        """
+
+        def construir() -> dict[str, Any]:
+            asignatura = self.contexto.asignaturas.obtener(asignatura_id)
+            evaluaciones = self.contexto.evaluaciones.listar_por_asignatura(asignatura_id)
+            calculo: dict[str, Any] = {}
+            if asignatura:
+                expediente = calcular_expediente([asignatura], {asignatura_id: evaluaciones})
+                calculo = expediente["asignaturas"][0]["calculo"]
+            return {"evaluaciones": evaluaciones, "calculo": calculo}
+
+        return self._responder(construir)
+
+    @Slot(str, result=str)
+    def crear_evaluacion(self, datos_json: str) -> str:
+        """Registra una evaluación para una asignatura.
+
+        Args:
+            datos_json: JSON con ``asignatura_id``, ``nombre``, ``peso``, ``tipo``,
+                ``nota``, ``nota_maxima`` y ``fecha``.
+
+        Returns:
+            JSON con la evaluación creada.
+        """
+
+        datos = self._leer_json(datos_json)
+        return self._responder(
+            lambda: self.contexto.evaluaciones.crear(
+                asignatura_id=int(datos.get("asignatura_id") or 0),
+                nombre=str(datos.get("nombre") or ""),
+                peso=float(datos.get("peso") or 0),
+                tipo=str(datos.get("tipo") or "examen"),
+                nota=float(datos["nota"]) if datos.get("nota") not in (None, "") else None,
+                nota_maxima=float(datos.get("nota_maxima") or 10),
+                fecha=str(datos.get("fecha") or ""),
+            ),
+            "notas",
+        )
+
+    @Slot(int, str, result=str)
+    def actualizar_evaluacion(self, evaluacion_id: int, datos_json: str) -> str:
+        """Actualiza una evaluación existente.
+
+        Args:
+            evaluacion_id: Identificador de la evaluación.
+            datos_json: Campos a modificar.
+
+        Returns:
+            JSON con la evaluación actualizada.
+        """
+
+        datos = self._leer_json(datos_json)
+        if "nota" in datos and datos["nota"] in ("", None):
+            datos["nota"] = None
+        return self._responder(
+            lambda: self.contexto.evaluaciones.actualizar(evaluacion_id, datos), "notas"
+        )
+
+    @Slot(int, result=str)
+    def eliminar_evaluacion(self, evaluacion_id: int) -> str:
+        """Elimina una evaluación.
+
+        Args:
+            evaluacion_id: Identificador de la evaluación.
+
+        Returns:
+            JSON con ``eliminada: true``.
+        """
+
+        return self._responder(
+            lambda: {"eliminada": self.contexto.evaluaciones.eliminar(evaluacion_id)},
+            "notas",
+        )
+
+    @Slot(float, result=str)
+    def obtener_expediente(self, objetivo: float = 5.0) -> str:
+        """Calcula el expediente completo ponderado por créditos.
+
+        Args:
+            objetivo: Nota objetivo para la calculadora (escala 0-10).
+
+        Returns:
+            JSON con asignaturas enriquecidas, media ponderada y agregados.
+        """
+
+        def construir() -> dict[str, Any]:
+            asignaturas = self.contexto.asignaturas.listar()
+            evaluaciones = {
+                int(asignatura["id"]): self.contexto.evaluaciones.listar_por_asignatura(
+                    int(asignatura["id"])
+                )
+                for asignatura in asignaturas
+            }
+            expediente = calcular_expediente(asignaturas, evaluaciones, objetivo)
+            for asignatura in expediente["asignaturas"]:
+                eventos = self.contexto.eventos.listar(asignatura_id=int(asignatura["id"]))
+                asignatura["total_eventos"] = len(eventos)
+                asignatura["eventos_pendientes"] = sum(
+                    1 for evento in eventos if not evento["completado"]
+                )
+            return expediente
+
+        return self._responder(construir)
+
+    @Slot(int, float, result=str)
+    def calcular_escenario(self, asignatura_id: int, objetivo: float) -> str:
+        """Recalcula una asignatura para una nota objetivo concreta.
+
+        Args:
+            asignatura_id: Identificador de la asignatura.
+            objetivo: Nota final deseada (escala 0-10).
+
+        Returns:
+            JSON con media actual, nota provisional y nota necesaria.
+        """
+
+        objetivo_acotado = min(10.0, max(0.0, float(objetivo)))
+        return self._responder(
+            lambda: calcular_asignatura(
+                self.contexto.evaluaciones.listar_por_asignatura(asignatura_id),
+                objetivo_acotado,
+            )
         )
 
     # ------------------------------------------------------------------
