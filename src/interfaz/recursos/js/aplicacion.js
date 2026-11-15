@@ -3,7 +3,7 @@
  *  APLICACIÓN PRINCIPAL · Agenda Académica Inteligente
  * ----------------------------------------------------------------------------
  *  Controlador de la ventana web: arranca el puente con Python, carga el estado
- *  inicial, gestiona la navegación entre las seis vistas, el cambio de tema, la
+ *  inicial, gestiona la navegación entre las siete vistas, el cambio de tema, la
  *  barra lateral colapsable, los modales de creación y los avisos internos.
  *
  *  Cada vista se registra con `AgendaApp.registrarVista(id, modulo)`. Un módulo

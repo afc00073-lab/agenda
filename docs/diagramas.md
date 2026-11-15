@@ -36,7 +36,7 @@ flowchart LR
         CU15["Mostrar u ocultar el gadget"]
         CU16["Ajustar opacidad y posición del gadget"]
         CU17["Cambiar tema visual"]
-        CU18["Exportar informe MD/CSV/HTML"]
+        CU18["Exportar informe académico en Markdown"]
         CU19["Crear o restaurar respaldo"]
         CU20["Activar inicio automático"]
         CU21["Crear tarea desde la bandeja"]

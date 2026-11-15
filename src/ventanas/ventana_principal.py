@@ -25,7 +25,7 @@ REGISTRO = logging.getLogger(__name__)
 
 
 class VentanaPrincipal(QMainWindow):
-    """Ventana nativa que hospeda la aplicación principal de seis vistas.
+    """Ventana nativa que hospeda la aplicación principal de siete vistas.
 
     Args:
         api: Puente compartido con el gadget.
@@ -114,7 +114,7 @@ class VentanaPrincipal(QMainWindow):
 
     @Slot(str)
     def navegar(self, vista: str) -> None:
-        """Navega a una de las seis vistas de la aplicación.
+        """Navega a una de las siete vistas de la aplicación.
 
         Args:
             vista: ``inicio``, ``calendario``, ``kanban``, ``asignaturas``,

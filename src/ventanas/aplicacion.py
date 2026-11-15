@@ -79,7 +79,7 @@ class AplicacionAgenda(QObject):
     Attributes:
         contexto: Fachada de repositorios SQLite.
         api: Puente compartido por la ventana principal y el gadget.
-        ventana: Ventana principal con las seis vistas.
+        ventana: Ventana principal con las siete vistas.
         gadget: Gadget flotante «Plan de Hoy».
         bandeja: Icono de la bandeja del sistema.
     """

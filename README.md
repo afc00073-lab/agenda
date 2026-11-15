@@ -18,11 +18,11 @@ escritorio, con notificaciones nativas del sistema operativo.
 | 📋 **Kanban** | Cuatro columnas (*Pendiente*, *En Desarrollo*, *Revisión*, *Entregado*), prioridades, subtareas y progreso. |
 | 📚 **Asignaturas** | Tarjetas con color, profesor, aula y enlaces; calculadora que indica **qué nota necesitas** para aprobar o llegar a notable/sobresaliente. |
 | ⏱️ **Estudio Focus** | Pomodoro circular SVG animado, modos 25/5, 50/10 y personalizado, sesiones persistidas. |
-| 📊 **Analíticas** | Horas por asignatura, puntualidad de entregas y carga académica con tooltips animados. |
+| 📊 **Analíticas** | Serie diaria, reparto por asignatura, mapa de calor de 8 semanas, franjas horarias y periodos de 7/14/30 días. |
 | 🪟 **Gadget** | Ventana sin bordes, translúcida y anclada al escritorio, con opacidad en vivo, bloqueo y vista compacta. |
 | 🔔 **Notificaciones** | Avisos nativos configurables (1 día, 2 horas, 15 minutos), resumen matutino y campana con historial. |
 | 🔄 **Calendarios** | Importación/suscripción `.ics` (Moodle, Google, Outlook) con deduplicación por `UID`. |
-| 💾 **Ajustes** | 3 temas CSS, respaldos `.zip`, exportación de informes e inicio automático. |
+| ⚙️ **Ajustes** | 3 temas CSS, preferencias de avisos, feeds iCalendar, respaldos `.zip`, arranque automático e informe académico Markdown. |
 
 ## 🧱 Arquitectura en 30 segundos
 
@@ -31,7 +31,7 @@ escritorio, con notificaciones nativas del sistema operativo.
 │                                                                              │
 │  HTML5 + CSS3 + JS  ◄──────►  ApiPuente (Python)  ◄──►  Servicios y repositorios
 │  (Chromium embebido)                │                                    │
-│  · index.html (6 vistas)            │                              SQLite WAL
+│  · index.html (7 vistas)            │                              SQLite WAL
 │  · gadget.html (transparente)       ▼                                    │
 │  · 3 temas + animaciones      Planificador de notificaciones       (un archivo)
 │                              Bandeja del sistema · Inicio automático
@@ -87,7 +87,7 @@ agenda/
 │   ├── puente/                # API QWebChannel expuesta a JavaScript
 │   ├── ventanas/              # Ventana principal, gadget, bandeja y orquestador
 │   └── interfaz/
-│       ├── index.html         # Aplicación principal (SPA de 6 vistas)
+│       ├── index.html         # Aplicación principal (SPA de 7 vistas)
 │       ├── gadget.html        # Gadget «Plan de Hoy»
 │       └── recursos/
 │           ├── css/           # variables · temas · animaciones · componentes · gadget
@@ -104,13 +104,21 @@ agenda/
 pytest
 ```
 
-La suite cubre repositorios y concurrencia SQLite, el sincronizador `.ics`, la
-calculadora de notas, el planificador de notificaciones y los respaldos.
+La suite (47 pruebas) cubre repositorios y concurrencia SQLite, el sincronizador
+`.ics`, la calculadora de notas, las analíticas, el generador de informes, el
+planificador de notificaciones y los respaldos.
+
+## 📸 La interfaz en imágenes
+
+| Analíticas | Ajustes |
+| --- | --- |
+| ![Panel de analíticas](docs/capturas/analiticas.png) | ![Vista de ajustes](docs/capturas/ajustes.png) |
 
 ## 📄 Documentación
 
 - [Arquitectura híbrida y modelo ER](docs/arquitectura.md)
 - [Diagramas de casos de uso, flujo y secuencia](docs/diagramas.md)
+- [Capturas de la interfaz](docs/capturas/)
 
 ## 🧑‍💻 Autor
 

@@ -34,6 +34,8 @@ flowchart TB
         Sincro["SincronizadorICS"]
         Pomodoro["GestorPomodoro"]
         Respaldos["GestorRespaldos"]
+        Analiticas["construir_analiticas"]
+        Informes["construir_informe"]
         Notificador["NotificadorNativo<br/>desktop-notifier"]
     end
 
@@ -43,7 +45,7 @@ flowchart TB
     end
 
     subgraph UI["Interfaz web offline"]
-        HTML["index.html<br/>6 vistas SPA"]
+        HTML["index.html<br/>7 vistas SPA"]
         CSS["CSS3 modular<br/>variables · temas · animaciones"]
         JS["JavaScript ES6<br/>módulos de vista"]
         GadgetHTML["gadget.html<br/>Plan de Hoy"]
@@ -68,6 +70,9 @@ flowchart TB
     Puente --> Sincro
     Puente --> Pomodoro
     Puente --> Respaldos
+    Puente --> Analiticas
+    Puente --> Informes
+    Repos --> Analiticas
     Sincro --> Repos
     Pomodoro --> Repos
     Respaldos --> BD
@@ -140,7 +145,7 @@ agenda/
 │   ├── puente/api_web.py       # Ranuras y señales expuestas a JavaScript
 │   ├── ventanas/               # Ventana principal, gadget, bandeja, orquestador
 │   └── interfaz/               # HTML, CSS modular, JS y SVG
-├── pruebas/                    # pytest: repositorios, ICS, notas, notificaciones
+├── pruebas/                    # pytest: repositorios, ICS, notas, analíticas, avisos, respaldos
 └── docs/                       # Arquitectura y diagramas Mermaid
 ```
 
@@ -300,3 +305,49 @@ erDiagram
   usan esquemas `http`, `https` o `mailto`.
 - Los respaldos se validan (cabecera SQLite y `PRAGMA integrity_check`) antes de
   restaurar y se guarda una copia de seguridad previa.
+
+---
+
+## 7. Ajustes, analíticas e informes
+
+### Vista de ajustes
+
+La vista `ajustes` es el centro de control de la aplicación y agrupa seis
+paneles independientes:
+
+1. **Tu espacio** — tarjetas visuales de los tres temas (`data-tema`), nombre del
+   estudiante y objetivo académico. El cambio de tema solo modifica
+   `document.documentElement.dataset.tema`; las transiciones CSS hacen el resto.
+2. **Avisos y automatización** — interruptores de notificaciones, resumen
+   matutino y sincronización, además de los chips de antelación
+   (`avisos_predeterminados`, lista de minutos separada por comas).
+3. **Calendarios iCalendar** — alta de feeds (nombre, URL y frecuencia),
+   importación de archivos `.ics`, pausa, borrado y sincronización manual.
+4. **Copias de seguridad** — creación de ZIP, listado con metadatos, borrado y
+   restauración en dos pasos. Las rutas se validan para no salir del directorio
+   de respaldos.
+5. **Sistema** — arranque automático (`InicioAutomatico`), carpeta de datos y
+   versión del esquema.
+6. **Informe académico** — previsualización del Markdown generado y guardado en
+   disco con `QFileDialog`.
+
+![Vista de ajustes](capturas/ajustes.png)
+
+### Analíticas
+
+`src/servicios/analiticas.py` es una función pura: recibe sesiones, eventos y
+asignaturas ya serializados y devuelve KPIs, serie diaria, reparto por
+asignatura, franjas horarias, mapa de calor de 56 días (alineado de lunes a
+domingo) y estado académico. La interfaz pinta la serie como un SVG con área
+degradada y el reparto como un `conic-gradient`, sin dependencias externas.
+
+![Panel de analíticas](capturas/analiticas.png)
+
+### Informe en Markdown
+
+`src/servicios/informes.py` combina el expediente ponderado, las analíticas y
+las entregas de los próximos 14 días para producir un documento con tablas,
+métricas, recomendaciones y un resumen ejecutivo. El puente expone
+`generar_informe` (previsualización) y `guardar_informe` (escritura en disco);
+el Markdown se renderiza en el cliente con un conversor mínimo que escapa el
+texto antes de insertarlo en el DOM.

@@ -74,3 +74,5 @@ Thumbs.db
 
 # --- Capturas generadas durante el desarrollo ---
 capturas/
+!docs/capturas/
+!docs/capturas/*.png
