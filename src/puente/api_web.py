@@ -30,6 +30,7 @@ from PySide6.QtWidgets import QFileDialog
 
 from src.base_datos.contexto import ContextoDatos
 from src.configuracion import NOMBRE_APLICACION
+from src.servicios.analiticas import construir_analiticas
 from src.servicios.calendario_ics import SincronizadorICS
 from src.servicios.calculadora_notas import calcular_asignatura, calcular_expediente
 from src.servicios.inicio_automatico import GestorInicioAutomatico
@@ -902,6 +903,46 @@ class ApiPuente(QObject):
         """
 
         return self._respuesta(self.gestor_pomodoro.estado())
+
+    @Slot(int, result=str)
+    def listar_sesiones(self, limite: int = 40) -> str:
+        """Devuelve las sesiones de estudio más recientes.
+
+        Args:
+            limite: Número máximo de sesiones.
+
+        Returns:
+            JSON con la lista de sesiones.
+        """
+
+        return self._responder(lambda: self.contexto.sesiones.listar(limite=max(1, limite)))
+
+    @Slot(int, result=str)
+    def obtener_analiticas(self, dias: int = 14) -> str:
+        """Calcula el informe de estudio y rendimiento.
+
+        Args:
+            dias: Periodo visible (7, 14 o 30 días).
+
+        Returns:
+            JSON con KPIs, series, reparto por asignatura, mapa de calor y
+            estado académico.
+        """
+
+        def construir() -> dict[str, Any]:
+            referencia = ahora()
+            desde_sesiones = a_iso(referencia - timedelta(days=70))
+            desde_eventos = a_iso(referencia - timedelta(days=60))
+            hasta_eventos = a_iso(referencia + timedelta(days=60))
+            return construir_analiticas(
+                self.contexto.sesiones.listar(desde=desde_sesiones, limite=2000),
+                self.contexto.eventos.listar(desde=desde_eventos, hasta=hasta_eventos),
+                self.contexto.asignaturas.listar(),
+                dias=dias,
+                referencia=referencia,
+            )
+
+        return self._responder(construir)
 
     # ------------------------------------------------------------------
     # Calendarios iCalendar
