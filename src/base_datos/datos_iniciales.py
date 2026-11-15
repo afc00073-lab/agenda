@@ -3,8 +3,11 @@
 Una agenda vacía no permite apreciar el diseño ni probar el calendario, el
 tablero o las analíticas. Este módulo siembra un curso ficticio completo
 (asignaturas, clases de la semana, exámenes, entregas, tareas con subtareas,
-evaluaciones y sesiones de estudio) **solo cuando la base de datos no contiene
-asignaturas**, de modo que nunca sobrescribe datos reales.
+evaluaciones y sesiones de estudio) **solo al crear la base de datos por
+primera vez**, de modo que nunca sobrescribe datos reales ni resucita un curso
+que el estudiante haya borrado. La comprobación de ``contar()`` actúa como
+segunda barrera de seguridad si alguien invoca el sembrado sobre una base con
+contenido.
 """
 
 from __future__ import annotations

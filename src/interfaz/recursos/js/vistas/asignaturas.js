@@ -575,6 +575,12 @@
             if (botonEliminar.dataset.confirmar !== "1") {
                 botonEliminar.dataset.confirmar = "1";
                 botonEliminar.innerHTML = `${icono("alerta")} Confirmar`;
+                ESTADO.contexto.toast(
+                    "¿Eliminar la asignatura?",
+                    "Se borrarán también sus clases, tareas y notas. Pulsa otra vez para confirmar.",
+                    "aviso",
+                    3600
+                );
                 global.setTimeout(() => {
                     if (botonEliminar.isConnected) {
                         botonEliminar.dataset.confirmar = "0";

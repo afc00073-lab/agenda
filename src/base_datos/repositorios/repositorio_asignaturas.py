@@ -157,10 +157,12 @@ class RepositorioAsignaturas(RepositorioBase):
         return self.obtener(asignatura_id)
 
     def eliminar(self, asignatura_id: int) -> bool:
-        """Elimina una asignatura.
+        """Elimina una asignatura junto con sus eventos y evaluaciones.
 
-        Los eventos y sesiones asociados quedan con ``asignatura_id`` nulo
-        (``ON DELETE SET NULL``); las evaluaciones se eliminan en cascada.
+        Los eventos de la asignatura (clases, exámenes, entregas y tareas) se
+        borran en la misma transacción para que no queden tarjetas huérfanas en
+        el calendario ni en el Kanban. Las sesiones de estudio se conservan con
+        ``asignatura_id`` nulo para no falsear el histórico de analíticas.
 
         Args:
             asignatura_id: Identificador a borrar.
@@ -170,6 +172,9 @@ class RepositorioAsignaturas(RepositorioBase):
         """
 
         with self.gestor.transaccion() as conexion:
+            conexion.execute(
+                "DELETE FROM eventos WHERE asignatura_id = ?", (asignatura_id,)
+            )
             cursor = conexion.execute("DELETE FROM asignaturas WHERE id = ?", (asignatura_id,))
             return cursor.rowcount > 0
 

@@ -2,7 +2,8 @@
 
 Agrupa el gestor de base de datos y una instancia de cada repositorio para que
 los servicios y el puente web reciban una única dependencia coherente. También
-se encarga de sembrar los datos de demostración en el primer arranque.
+se encarga de sembrar los datos de demostración en el primer arranque, solo
+cuando el archivo de base de datos se crea por primera vez.
 """
 
 from __future__ import annotations
@@ -26,8 +27,9 @@ class ContextoDatos:
 
     Args:
         ruta: Ruta de la base de datos. Por defecto, la de la configuración.
-        sembrar_ejemplo: Si es ``True``, crea el curso de demostración cuando
-            la base está vacía.
+        sembrar_ejemplo: Si es ``True``, crea el curso de demostración la
+            primera vez que se crea el archivo de base de datos. Un archivo
+            existente nunca se vuelve a sembrar, aunque esté vacío.
 
     Attributes:
         gestor: Gestor de conexiones SQLite en modo WAL.
@@ -46,6 +48,11 @@ class ContextoDatos:
         sembrar_ejemplo: bool = True,
     ) -> None:
         asegurar_directorios()
+        ruta_final = Path(ruta).expanduser() if ruta is not None else RUTA_BASE_DATOS
+        # Los datos de demostración solo se crean junto con el archivo de base
+        # de datos. Si ya existía, se respeta aunque el estudiante lo haya
+        # vaciado: borrar todas las asignaturas no debe resucitar el curso.
+        primera_creacion = not ruta_final.exists()
         self.gestor = GestorBaseDatos(ruta or RUTA_BASE_DATOS)
         self.asignaturas = RepositorioAsignaturas(self.gestor)
         self.eventos = RepositorioEventos(self.gestor)
@@ -55,7 +62,7 @@ class ContextoDatos:
         self.notificaciones = RepositorioNotificaciones(self.gestor)
         self.configuracion = RepositorioConfiguracion(self.gestor)
         self.configuracion.asegurar_predeterminados()
-        if sembrar_ejemplo:
+        if sembrar_ejemplo and primera_creacion:
             sembrar_demostracion(self.gestor)
 
     @property

@@ -107,6 +107,36 @@ def test_eliminar_evento_arrastra_subtareas(contexto: ContextoDatos) -> None:
     assert contexto.eventos.subtareas_de(tarea["id"]) == []
 
 
+def test_eliminar_asignatura_arrastra_eventos_y_evaluaciones(
+    contexto: ContextoDatos,
+) -> None:
+    """Al borrar una asignatura no quedan eventos huérfanos ni notas sueltas."""
+
+    asignatura = contexto.asignaturas.crear(nombre="Redes")
+    clase = contexto.eventos.crear(
+        titulo="Clase de Redes",
+        fecha_inicio="2026-05-04T09:00",
+        tipo="clase",
+        asignatura_id=asignatura["id"],
+    )
+    tarea = contexto.eventos.crear(
+        titulo="Práctica de Redes",
+        fecha_inicio="2026-05-08T23:59",
+        tipo="tarea",
+        asignatura_id=asignatura["id"],
+    )
+    contexto.evaluaciones.crear(
+        asignatura_id=asignatura["id"], nombre="Parcial", peso=50, nota=6
+    )
+
+    assert contexto.asignaturas.eliminar(asignatura["id"]) is True
+
+    assert contexto.eventos.obtener(clase["id"]) is None
+    assert contexto.eventos.obtener(tarea["id"]) is None
+    assert contexto.evaluaciones.listar_por_asignatura(asignatura["id"]) == []
+    assert contexto.asignaturas.obtener(asignatura["id"]) is None
+
+
 def test_evaluacion_y_nota(contexto: ContextoDatos) -> None:
     """Las evaluaciones se guardan con peso, nota y fecha opcional."""
 

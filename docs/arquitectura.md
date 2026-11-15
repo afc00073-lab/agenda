@@ -273,6 +273,11 @@ erDiagram
 - **`uid_ics` único parcial** (`WHERE uid_ics IS NOT NULL`): evita duplicados al
   resincronizar sin impedir muchos eventos manuales con `uid_ics` nulo.
 - **`subtareas`** separada para permitir reordenación y progreso calculado.
+- **Borrado de una asignatura**: el repositorio elimina en la misma transacción
+  sus evaluaciones y todos sus eventos (clases, exámenes, entregas y tareas),
+  de modo que no quedan tarjetas huérfanas en el calendario ni en el Kanban.
+  Las sesiones de estudio sí se conservan con `asignatura_id` nulo para que el
+  histórico de analíticas no cambie.
 - **`notificaciones`** es un historial y a la vez una cola: `programada_para`
   permite posponer y `vista` alimenta la campana de la interfaz.
 - **`configuracion`** clave-valor evita migraciones por cada preferencia nueva.

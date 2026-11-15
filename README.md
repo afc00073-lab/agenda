@@ -71,7 +71,8 @@ del sistema. En Linux, si el motor web no arranca en un contenedor, ejecuta
 
 No hay atajos de teclado: la navegación usa la barra lateral, los formularios se
 abren con modales animados, las tarjetas se arrastran, los selectores de tema
-son visuales y las acciones destructivas piden confirmación con un modal. El
+son visuales y las acciones destructivas piden una segunda pulsación de
+confirmación. El
 gadget se mueve arrastrando su cabecera y sus controles aparecen al pasar el
 ratón.
 
@@ -98,15 +99,23 @@ agenda/
 └── requirements.txt
 ```
 
+## 🧪 Datos de demostración
+
+El primer arranque crea un curso ficticio (asignaturas, clases, entregas,
+evaluaciones y sesiones de estudio) para que el calendario y las analíticas no
+estén vacíos. Solo ocurre **al crear la base de datos por primera vez**: si
+borras una asignatura —o todas— seguirán borradas después de reiniciar, y sus
+clases, tareas y notas se eliminan con ella.
+
 ## ✅ Pruebas
 
 ```bash
 pytest
 ```
 
-La suite (47 pruebas) cubre repositorios y concurrencia SQLite, el sincronizador
-`.ics`, la calculadora de notas, las analíticas, el generador de informes, el
-planificador de notificaciones y los respaldos.
+La suite (51 pruebas) cubre repositorios y concurrencia SQLite, el sembrado
+inicial, el sincronizador `.ics`, la calculadora de notas, las analíticas, el
+generador de informes, el planificador de notificaciones y los respaldos.
 
 ## 📸 La interfaz en imágenes
 
