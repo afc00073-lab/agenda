@@ -33,6 +33,7 @@ from src.configuracion import NOMBRE_APLICACION
 from src.servicios.analiticas import construir_analiticas
 from src.servicios.calendario_ics import SincronizadorICS
 from src.servicios.calculadora_notas import calcular_asignatura, calcular_expediente
+from src.servicios.informes import construir_informe
 from src.servicios.inicio_automatico import GestorInicioAutomatico
 from src.servicios.notificaciones import PlanificadorNotificaciones
 from src.servicios.pomodoro import GestorPomodoro
@@ -439,23 +440,36 @@ class ApiPuente(QObject):
         """
 
         def construir() -> dict[str, Any]:
-            asignaturas = self.contexto.asignaturas.listar()
-            evaluaciones = {
-                int(asignatura["id"]): self.contexto.evaluaciones.listar_por_asignatura(
-                    int(asignatura["id"])
-                )
-                for asignatura in asignaturas
-            }
-            expediente = calcular_expediente(asignaturas, evaluaciones, objetivo)
-            for asignatura in expediente["asignaturas"]:
-                eventos = self.contexto.eventos.listar(asignatura_id=int(asignatura["id"]))
-                asignatura["total_eventos"] = len(eventos)
-                asignatura["eventos_pendientes"] = sum(
-                    1 for evento in eventos if not evento["completado"]
-                )
-            return expediente
+            return self._construir_expediente(objetivo)
 
         return self._responder(construir)
+
+    def _construir_expediente(self, objetivo: float) -> dict[str, Any]:
+        """Calcula el expediente enriquecido con el conteo de eventos.
+
+        Args:
+            objetivo: Nota objetivo para la calculadora (escala 0-10).
+
+        Returns:
+            Expediente ponderado con ``total_eventos`` y ``eventos_pendientes``
+            por asignatura.
+        """
+
+        asignaturas = self.contexto.asignaturas.listar()
+        evaluaciones = {
+            int(asignatura["id"]): self.contexto.evaluaciones.listar_por_asignatura(
+                int(asignatura["id"])
+            )
+            for asignatura in asignaturas
+        }
+        expediente = calcular_expediente(asignaturas, evaluaciones, objetivo)
+        for asignatura in expediente["asignaturas"]:
+            eventos = self.contexto.eventos.listar(asignatura_id=int(asignatura["id"]))
+            asignatura["total_eventos"] = len(eventos)
+            asignatura["eventos_pendientes"] = sum(
+                1 for evento in eventos if not evento["completado"]
+            )
+        return expediente
 
     @Slot(int, float, result=str)
     def calcular_escenario(self, asignatura_id: int, objetivo: float) -> str:
@@ -1058,9 +1072,10 @@ class ApiPuente(QObject):
         """
 
         resultado = self.sincronizador.sincronizar_suscripcion(suscripcion_id)
-        if resultado.get("ok"):
-            self.datosActualizados.emit("evento")
-        return json.dumps(resultado, ensure_ascii=False, default=str)
+        if not resultado.get("ok"):
+            return self._error(str(resultado.get("error") or "No se pudo sincronizar el calendario"))
+        self.datosActualizados.emit("evento")
+        return self._respuesta(resultado)
 
     @Slot(result=str)
     def sincronizar_todo_ics(self) -> str:
@@ -1317,6 +1332,102 @@ class ApiPuente(QObject):
             lambda: self.gestor_respaldos.restaurar_respaldo(ruta), "todo"
         )
 
+    @Slot(str, result=str)
+    def eliminar_respaldo(self, ruta: str) -> str:
+        """Borra una copia de seguridad del disco.
+
+        Args:
+            ruta: Archivo ZIP que se desea eliminar.
+
+        Returns:
+            JSON con ``eliminada: true`` si el archivo existía.
+        """
+
+        return self._responder(
+            lambda: {"eliminada": self.gestor_respaldos.eliminar_respaldo(ruta)},
+            "configuracion",
+        )
+
+    @Slot(result=str)
+    def abrir_carpeta_respaldos(self) -> str:
+        """Abre la carpeta de copias de seguridad en el explorador del sistema.
+
+        Returns:
+            JSON con la ruta abierta.
+        """
+
+        destino = self.gestor_respaldos.directorio
+        abierto = QDesktopServices.openUrl(QUrl.fromLocalFile(str(destino)))
+        return self._respuesta({"ruta": str(destino), "abierto": bool(abierto)})
+
+    # ------------------------------------------------------------------
+    # Informes académicos
+    # ------------------------------------------------------------------
+    def _construir_informe(self) -> dict[str, Any]:
+        """Genera el informe académico con los datos actuales.
+
+        Returns:
+            Diccionario del informe, incluido su texto Markdown.
+        """
+
+        referencia = ahora()
+        objetivo = float(self.contexto.configuracion.obtener("objetivo_academico", "5.0") or 5.0)
+        expediente = self._construir_expediente(objetivo)
+        analiticas = construir_analiticas(
+            self.contexto.sesiones.listar(
+                desde=a_iso(referencia - timedelta(days=70)), limite=2000
+            ),
+            self.contexto.eventos.listar(
+                desde=a_iso(referencia - timedelta(days=60)),
+                hasta=a_iso(referencia + timedelta(days=60)),
+            ),
+            self.contexto.asignaturas.listar(),
+            dias=30,
+            referencia=referencia,
+        )
+        eventos = self.contexto.eventos.listar(
+            desde=a_iso(referencia - timedelta(days=7)),
+            hasta=a_iso(referencia + timedelta(days=30)),
+        )
+        return construir_informe(expediente, analiticas, eventos, referencia)
+
+    @Slot(result=str)
+    def generar_informe(self) -> str:
+        """Construye el informe académico para previsualizarlo en ajustes.
+
+        Returns:
+            JSON con métricas, asignaturas, entregas, recomendaciones y
+            el documento Markdown completo.
+        """
+
+        return self._responder(self._construir_informe)
+
+    @Slot(result=str)
+    def guardar_informe(self) -> str:
+        """Pide una ruta y guarda el informe académico en Markdown.
+
+        Returns:
+            JSON con la ruta del archivo escrito o un aviso de cancelación.
+        """
+
+        informe = self._construir_informe()
+        sugerido = Path.home() / "informe_academico.md"
+        ruta, _ = QFileDialog.getSaveFileName(
+            None,
+            "Guardar informe académico",
+            str(sugerido),
+            "Markdown (*.md);;Texto (*.txt)",
+        )
+        if not ruta:
+            return self._respuesta({"cancelado": True}, "Guardado cancelado")
+        try:
+            Path(ruta).write_text(informe["markdown"], encoding="utf-8")
+        except OSError as error:
+            return self._error(f"No se pudo escribir el informe: {error}")
+        return self._respuesta(
+            {"ruta": ruta, "nombre": Path(ruta).name}, "Informe guardado"
+        )
+
     @Slot(result=str)
     def estado_inicio_automatico(self) -> str:
         """Consulta si la agenda arranca con el sistema.
@@ -1325,7 +1436,9 @@ class ApiPuente(QObject):
             JSON con el estado del mecanismo nativo.
         """
 
-        return self._respuesta(self.inicio_automatico.estado())
+        return self._respuesta(
+            {**self.inicio_automatico.estado(), "directorio_datos": str(self.contexto.directorio_datos)}
+        )
 
     @Slot(result=str)
     def alternar_inicio_automatico(self) -> str:
@@ -1336,10 +1449,14 @@ class ApiPuente(QObject):
         """
 
         resultado = self.inicio_automatico.alternar()
+        if not resultado.get("ok"):
+            return self._error(str(resultado.get("error") or "No se pudo cambiar el arranque automático"))
         self.contexto.configuracion.guardar(
             "inicio_automatico", "1" if self.inicio_automatico.esta_activo() else "0"
         )
-        return json.dumps(resultado, ensure_ascii=False, default=str)
+        return self._respuesta(
+            {**self.inicio_automatico.estado(), "directorio_datos": str(self.contexto.directorio_datos)}
+        )
 
     @Slot(str, result=str)
     def abrir_enlace(self, url: str) -> str:
